@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4ced026086adbbfbc0be033326561477",
-    "content-hash": "22868f09bd38652d26809f581ed05753",
+    "hash": "63c72cf14ada6488c1e1ce72ccf4a554",
+    "content-hash": "009d759277bf96873e3257fa74558cb1",
     "packages": [
         {
             "name": "composer/installers",
@@ -106,50 +106,6 @@
             "time": "2016-01-27 12:54:22"
         },
         {
-            "name": "wordimpress/give",
-            "version": "1.3.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/WordImpress/Give.git",
-                "reference": "4562c5cf03538f145fd09666d54e6ba0ec94842c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/WordImpress/Give/zipball/4562c5cf03538f145fd09666d54e6ba0ec94842c",
-                "reference": "4562c5cf03538f145fd09666d54e6ba0ec94842c",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "~1.0.6",
-                "php": ">=5.3.0"
-            },
-            "type": "wordpress-plugin",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL"
-            ],
-            "authors": [
-                {
-                    "name": "Devin Walker",
-                    "email": "devin@givewp.com",
-                    "homepage": "https://givewp.com"
-                },
-                {
-                    "name": "Matt Cromwell",
-                    "email": "matt@givewp.com",
-                    "homepage": "https://givewp.com"
-                }
-            ],
-            "description": "Give - The best way to accept donations on WordPress",
-            "homepage": "http://givewp.com",
-            "keywords": [
-                "donations",
-                "plugin",
-                "wordpress"
-            ],
-            "time": "2016-03-09 20:30:07"
-        },
-        {
             "name": "wp-pay/core",
             "version": "1.3.4",
             "source": {
@@ -209,6 +165,26 @@
                 "wp"
             ],
             "time": "2016-03-02 07:13:46"
+        },
+        {
+            "name": "wpackagist-plugin/give",
+            "version": "1.3.6",
+            "source": {
+                "type": "svn",
+                "url": "http://plugins.svn.wordpress.org/give/",
+                "reference": "tags/1.3.6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/give.1.3.6.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/give/"
         },
         {
             "name": "xrstf/composer-php52",
