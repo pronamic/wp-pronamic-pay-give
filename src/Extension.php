@@ -31,30 +31,13 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	 * Construct and initializes an Charitable extension object.
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ) );
-
 		add_filter( 'give_payment_gateways', array( $this, 'give_payment_gateways' ) );
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_text_' . self::SLUG,   array( __CLASS__, 'source_text' ), 10, 2 );
-
-		// @todo: remove, for local development environment only (prevents using server name in URL)
-		add_filter( 'give_get_current_page_url', array( __CLASS__, 'give_current_page_url' ) );
 	}
 
 	//////////////////////////////////////////////////
-
-	public static function give_current_page_url( $page_url ) {
-		global $wp;
-
-		return home_url( add_query_arg( array(), $wp->request ) );
-	}
-
-	/**
-	 * Initialize
-	 */
-	public function init() {
-	}
 
 	/**
 	 * Give payments gateways.
@@ -64,28 +47,28 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	 * @retrun array
 	 */
 	public function give_payment_gateways( $gateways ) {
-		$classes = array(
-			'Pronamic_WP_Pay_Extensions_Give_Gateway',
-			//'Pronamic_WP_Pay_Extensions_Give_BankTransferGateway',
-			//'Pronamic_WP_Pay_Extensions_Give_CreditCardGateway',
-			//'Pronamic_WP_Pay_Extensions_Give_DirectDebitGateway',
-			//'Pronamic_WP_Pay_Extensions_Give_IDealGateway',
-			//'Pronamic_WP_Pay_Extensions_Give_MisterCashGateway',
-			//'Pronamic_WP_Pay_Extensions_Give_SofortGateway',
-		);
-
-		foreach ( $classes as $class ) {
-			$gateway = new $class;
-
-			$id = $gateway->get_gateway_id();
-
-			$gateways[ $id ] = array(
-				'admin_label'    => $gateway->name,
-				'checkout_label' => $gateway->name,
+		if ( ! isset( $this->gateways ) ) {
+			$classes = array(
+				'Pronamic_WP_Pay_Extensions_Give_Gateway',
+				'Pronamic_WP_Pay_Extensions_Give_BankTransferGateway',
+				'Pronamic_WP_Pay_Extensions_Give_CreditCardGateway',
+				'Pronamic_WP_Pay_Extensions_Give_DirectDebitGateway',
+				'Pronamic_WP_Pay_Extensions_Give_IDealGateway',
+				'Pronamic_WP_Pay_Extensions_Give_MisterCashGateway',
+				'Pronamic_WP_Pay_Extensions_Give_SofortGateway',
 			);
+
+			foreach ( $classes as $class ) {
+				$gateway = new $class;
+
+				$this->gateways[ $gateway->id ] = array(
+					'admin_label'    => $gateway->name,
+					'checkout_label' => $gateway->name,
+				);
+			}
 		}
 
-		return $gateways;
+		return array_merge( $gateways, $this->gateways );
 	}
 
 	//////////////////////////////////////////////////
@@ -103,7 +86,7 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 			case Pronamic_WP_Pay_Statuses::CANCELLED :
 				give_update_payment_status( $donation_id, 'cancelled' );
 
-				$url = home_url();
+				$url = give_get_failed_transaction_uri();
 
 				break;
 			case Pronamic_WP_Pay_Statuses::EXPIRED :

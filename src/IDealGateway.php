@@ -12,23 +12,17 @@
  */
 class Pronamic_WP_Pay_Extensions_Give_IDealGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {
 	/**
-	 * The unique ID of this payment gateway
-	 *
-	 * @var string
-	 */
-	const ID = 'pronamic_pay_ideal';
-
-	//////////////////////////////////////////////////
-
-	/**
 	 * Constructs and initialize an iDEAL gateway
 	 */
 	public function __construct() {
-		parent::__construct();
+		// Unique ID for this payment gateway.
+		$this->id = 'pronamic_pay_ideal';
 
 		$this->name = __( 'iDEAL', 'pronamic_ideal' );
 
 		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::IDEAL;
+
+		parent::__construct();
 	}
 
 	///**
@@ -76,16 +70,4 @@ class Pronamic_WP_Pay_Extensions_Give_IDealGateway extends Pronamic_WP_Pay_Exten
 	//		echo $field['gateway']->get_input_html();
 	//	}
 	//}
-
-	/**
-	 * Returns the current gateway's ID.
-	 *
-	 * @return  string
-	 * @access  public
-	 * @static
-	 * @since   1.0.3
-	 */
-	public static function get_gateway_id() {
-		return self::ID;
-	}
 }
