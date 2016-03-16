@@ -35,7 +35,7 @@
 	"require": {
 		"php": ">=5.2.4",
 		"xrstf/composer-php52": "1.*",
-		"wpackagist-plugin/charitable": "1.1.5",
+		"wordimpress/give": "1.3.6",
 		"wp-pay/core": "^1.3.4"
 	},
 	"require-dev": {
