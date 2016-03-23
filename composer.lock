@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "63c72cf14ada6488c1e1ce72ccf4a554",
-    "content-hash": "009d759277bf96873e3257fa74558cb1",
+    "hash": "e47584963542fcc73b78590751ffbeb6",
+    "content-hash": "f14528fd8a29dd748ab65b995da51767",
     "packages": [
         {
             "name": "composer/installers",
@@ -107,16 +107,16 @@
         },
         {
             "name": "wp-pay/core",
-            "version": "1.3.4",
+            "version": "1.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-pay/core.git",
-                "reference": "24ce9a374a90d462bc5c321133beb71029fb7a70"
+                "reference": "6d29e36e13f919b4adad939a1ac1e1923749fddc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-pay/core/zipball/24ce9a374a90d462bc5c321133beb71029fb7a70",
-                "reference": "24ce9a374a90d462bc5c321133beb71029fb7a70",
+                "url": "https://api.github.com/repos/wp-pay/core/zipball/6d29e36e13f919b4adad939a1ac1e1923749fddc",
+                "reference": "6d29e36e13f919b4adad939a1ac1e1923749fddc",
                 "shasum": ""
             },
             "require": {
@@ -128,7 +128,7 @@
                 "satooshi/php-coveralls": "^0.7.1",
                 "squizlabs/php_codesniffer": "^2.2.0",
                 "wp-cli/wp-cli": "^0.21.1",
-                "wp-coding-standards/wpcs": "0.8.0"
+                "wp-coding-standards/wpcs": "0.9.0"
             },
             "type": "library",
             "autoload": {
@@ -164,14 +164,14 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2016-03-02 07:13:46"
+            "time": "2016-03-22 12:29:58"
         },
         {
             "name": "wpackagist-plugin/give",
             "version": "1.3.6",
             "source": {
                 "type": "svn",
-                "url": "http://plugins.svn.wordpress.org/give/",
+                "url": "https://plugins.svn.wordpress.org/give/",
                 "reference": "tags/1.3.6"
             },
             "dist": {
