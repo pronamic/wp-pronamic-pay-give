@@ -33,7 +33,8 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	public function __construct() {
 		add_filter( 'give_payment_gateways', array( $this, 'give_payment_gateways' ) );
 
-		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 2 );
+		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
+		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
 		add_filter( 'pronamic_payment_source_text_' . self::SLUG,   array( __CLASS__, 'source_text' ), 10, 2 );
 	}
 
@@ -71,7 +72,33 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 		return array_merge( $gateways, $this->gateways );
 	}
 
-	//////////////////////////////////////////////////
+	/**
+	 * Payment redirect URL filter.
+	 *
+	 * @param string                  $url
+	 * @param Pronamic_WP_Pay_Payment $payment
+	 * @return string
+	 */
+	public static function redirect_url( $url, $payment ) {
+		$donation_id = $payment->get_source_id();
+
+		switch ( $payment->get_status() ) {
+			case Pronamic_WP_Pay_Statuses::CANCELLED :
+				$url = give_get_failed_transaction_uri();
+
+				break;
+			case Pronamic_WP_Pay_Statuses::FAILURE :
+				$url = give_get_failed_transaction_uri();
+
+				break;
+			case Pronamic_WP_Pay_Statuses::SUCCESS :
+				$url = give_get_success_page_uri();
+
+				break;
+		}
+
+		return $url;
+	}
 
 	/**
 	 * Update lead status of the specified payment
@@ -79,47 +106,31 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	 * @see https://github.com/Charitable/Charitable/blob/1.1.4/includes/gateways/class-charitable-gateway-paypal.php#L229-L357
 	 * @param Pronamic_Pay_Payment $payment
 	 */
-	public static function status_update( Pronamic_Pay_Payment $payment, $can_redirect = false ) {
+	public static function status_update( Pronamic_Pay_Payment $payment ) {
 		$donation_id = $payment->get_source_id();
 
 		switch ( $payment->get_status() ) {
 			case Pronamic_WP_Pay_Statuses::CANCELLED :
 				give_update_payment_status( $donation_id, 'cancelled' );
 
-				$url = give_get_failed_transaction_uri();
-
 				break;
 			case Pronamic_WP_Pay_Statuses::EXPIRED :
 				give_update_payment_status( $donation_id, 'abandoned' );
-
-				$url = home_url();
 
 				break;
 			case Pronamic_WP_Pay_Statuses::FAILURE :
 				give_update_payment_status( $donation_id, 'failed' );
 
-				$url = give_get_failed_transaction_uri();
-
 				break;
 			case Pronamic_WP_Pay_Statuses::SUCCESS :
 				give_update_payment_status( $donation_id, 'publish' );
-
-				$url = give_get_success_page_uri();
 
 				break;
 			case Pronamic_WP_Pay_Statuses::OPEN :
 			default:
 				give_update_payment_status( $donation_id, 'pending' );
 
-				$url = home_url();
-
 				break;
-		}
-
-		if ( $can_redirect ) {
-			wp_redirect( $url );
-
-			exit;
 		}
 	}
 

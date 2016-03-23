@@ -61,6 +61,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			'id'      => sprintf( 'give_%s_configuration', $this->id ),
 			'type'    => 'select',
 			'options' => Pronamic_WP_Pay_Plugin::get_config_select_options( $this->payment_method ),
+			'default' => get_option( 'pronamic_pay_config_id' ),
 		);
 
 		return $settings;
