@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_BankTransferGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {
