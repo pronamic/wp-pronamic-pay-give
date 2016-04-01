@@ -80,8 +80,6 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	 * @return string
 	 */
 	public static function redirect_url( $url, $payment ) {
-		$donation_id = $payment->get_source_id();
-
 		switch ( $payment->get_status() ) {
 			case Pronamic_WP_Pay_Statuses::CANCELLED :
 				$url = give_get_failed_transaction_uri();
