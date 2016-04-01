@@ -21,14 +21,16 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initialize a gateway
+	 * Constructs and initialize a gateway.
+	 *
+	 * @param string $id
+	 * @param string $name
+	 * @param string $payment_method
 	 */
-	public function __construct() {
-		if ( __CLASS__ === get_class( $this ) ) {
-			$this->id = 'pronamic_pay';
-
-			$this->name = __( 'Pronamic', 'pronamic_ideal' );
-		}
+	public function __construct( $id = 'pronamic_pay', $name = 'Pronamic', $payment_method = null ) {
+		$this->id             = $id;
+		$this->name           = $name;
+		$this->payment_method = $payment_method;
 
 		// Add filters and actions
 		add_filter( 'give_settings_gateways', array( $this, 'gateway_settings' ) );
