@@ -71,6 +71,15 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 		$payment_mode = give_get_chosen_gateway( $form_id );
 
 		if ( $this->id === $payment_mode ) {
+			// Errors
+			if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
+				printf(
+					'<div class="give_error">%s</div>',
+					Pronamic_WP_Pay_Plugin::get_default_error_message()
+				);
+			}
+
+			// Gateway
 			$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
 
 			$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $config_id );
@@ -118,10 +127,23 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 
 		if ( ! $donation_id ) {
 			// Record the error
-			give_record_gateway_error( __( 'Payment Error', 'give' ), sprintf( __( 'Payment creation failed before sending buyer to payment provider. Payment data: %s', 'pronamic_ideal' ), json_encode( $payment_data ) ), $donation_id );
+			// /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
+			// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+			give_record_gateway_error(
+				__( 'Payment Error', 'pronamic_ideal' ),
+				sprintf(
+					__( 'Payment creation failed before sending buyer to payment provider. Payment data: %s', 'pronamic_ideal' ),
+					json_encode( $payment_data )
+				),
+				$donation_id
+			);
 
 			// Problems? send back
-			give_send_back_to_checkout( '?payment-mode=' . $purchase_data['post_data']['give-gateway'] );
+			// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
+			give_send_back_to_checkout( array(
+				'payment-error' => true,
+				'payment-mode'  => $purchase_data['post_data']['give-gateway'],
+			) );
 		} else {
 			$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
 
@@ -137,7 +159,23 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 
 				$error = $gateway->get_error();
 
-				if ( ! is_wp_error( $error ) ) {
+				if ( is_wp_error( $error ) ) {
+					// Record the error
+					// /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
+					// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+					give_record_gateway_error(
+						__( 'Payment Error', 'pronamic_ideal' ),
+						implode( '<br />', $error->get_error_messages() ),
+						$donation_id
+					);
+
+					// Problems? send back
+					// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
+					give_send_back_to_checkout( array(
+						'payment-error' => true,
+						'payment-mode'  => $purchase_data['post_data']['give-gateway'],
+					) );
+				} else {
 					// Redirect
 					$gateway->redirect( $payment );
 				}
