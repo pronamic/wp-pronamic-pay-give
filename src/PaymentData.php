@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_PaymentData {
@@ -173,19 +173,11 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
 	 * @return string
 	 */
-	public function get_normal_return_url() {
-		return home_url();
-	}
+	public function get_normal_return_url() {}
 
-	public function get_cancel_url() {
-		return home_url();
-	}
+	public function get_cancel_url() {}
 
-	public function get_success_url() {
-		return give_get_success_page_uri();
-	}
+	public function get_success_url() {}
 
-	public function get_error_url() {
-		return give_get_failed_transaction_uri();
-	}
+	public function get_error_url() {}
 }

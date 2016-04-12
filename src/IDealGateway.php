@@ -7,21 +7,18 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_IDealGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {
 	/**
-	 * Constructs and initialize an iDEAL gateway
+	 * Constructs and initialize iDEAL gateway.
 	 */
 	public function __construct() {
-		// Unique ID for this payment gateway.
-		$this->id = 'pronamic_pay_ideal';
-
-		$this->name = __( 'iDEAL', 'pronamic_ideal' );
-
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::IDEAL;
-
-		parent::__construct();
+		parent::__construct(
+			'pronamic_pay_ideal',
+			__( 'iDEAL', 'pronamic_ideal' ),
+			Pronamic_WP_Pay_PaymentMethods::IDEAL
+		);
 	}
 }

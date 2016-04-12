@@ -7,20 +7,18 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_BankTransferGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {
 	/**
-	 * Constructs and initialize a Bank Transfer gateway
+	 * Constructs and initialize Bank Transfer gateway
 	 */
 	public function __construct() {
-		$this->id = 'pronamic_pay_bank_transfer';
-
-		$this->name = __( 'Bank Transfer', 'pronamic_ideal' );
-
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER;
-
-		parent::__construct();
+		parent::__construct(
+			'pronamic_pay_bank_transfer',
+			__( 'Bank Transfer', 'pronamic_ideal' ),
+			Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER
+		);
 	}
 }

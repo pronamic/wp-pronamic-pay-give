@@ -7,20 +7,18 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_MisterCashGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {
 	/**
-	 * Constructs and initialize a Mister Cash gateway
+	 * Constructs and initialize Mister Cash gateway.
 	 */
 	public function __construct() {
-		$this->id = 'pronamic_pay_mister_cash';
-
-		$this->name = __( 'Bancontact/Mister Cash', 'pronamic_ideal' );
-
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::MISTER_CASH;
-
-		parent::__construct();
+		parent::__construct(
+			'pronamic_pay_mister_cash',
+			__( 'Bancontact/Mister Cash', 'pronamic_ideal' ),
+			Pronamic_WP_Pay_PaymentMethods::MISTER_CASH
+		);
 	}
 }

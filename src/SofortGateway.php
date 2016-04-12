@@ -7,20 +7,18 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_SofortGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {
 	/**
-	 * Constructs and initialize a Sofort gateway
+	 * Constructs and initialize Sofort gateway.
 	 */
 	public function __construct() {
-		$this->id = 'pronamic_pay_sofort';
-
-		$this->name = __( 'SOFORT Banking', 'pronamic_ideal' );
-
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::SOFORT;
-
-		parent::__construct();
+		parent::__construct(
+			'pronamic_pay_sofort',
+			__( 'SOFORT Banking', 'pronamic_ideal' ),
+			Pronamic_WP_Pay_PaymentMethods::SOFORT
+		);
 	}
 }
