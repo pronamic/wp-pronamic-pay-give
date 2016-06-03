@@ -105,7 +105,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	 */
 	function process_purchase( $purchase_data ) {
 		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'give-gateway' ) ) {
-			wp_die( __( 'Nonce verification has failed', 'give' ), __( 'Error', 'give' ), array( 'response' => 403 ) );
+			wp_die( __( 'Nonce verification has failed', 'pronamic_ideal' ), __( 'Error', 'pronamic_ideal' ), array( 'response' => 403 ) );
 		}
 
 		$form_id = intval( $purchase_data['post_data']['give-form-id'] );
