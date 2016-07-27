@@ -17,8 +17,8 @@ class Pronamic_WP_Pay_Extensions_Give_MisterCashGateway extends Pronamic_WP_Pay_
 	public function __construct() {
 		parent::__construct(
 			'pronamic_pay_mister_cash',
-			__( 'Bancontact/Mister Cash', 'pronamic_ideal' ),
-			Pronamic_WP_Pay_PaymentMethods::MISTER_CASH
+			__( 'Bancontact', 'pronamic_ideal' ),
+			Pronamic_WP_Pay_PaymentMethods::BANCONTACT
 		);
 	}
 }
