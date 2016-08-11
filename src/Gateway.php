@@ -66,6 +66,14 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			'default' => get_option( 'pronamic_pay_config_id' ),
 		);
 
+		$settings[] = array(
+			'name'    => __( 'Transaction description', 'pronamic_ideal' ),
+			'desc'    => sprintf( __( 'Available tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code>', '{donation_id}' ) ),
+			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
+			'type'    => 'text',
+			'default' => __( 'Give transaction {donation_id}', 'pronamic_ideal' ),
+		);
+
 		return $settings;
 	}
 
@@ -153,7 +161,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 
 			if ( $gateway ) {
 				// Data
-				$data = new Pronamic_WP_Pay_Extensions_Give_PaymentData( $donation_id );
+				$data = new Pronamic_WP_Pay_Extensions_Give_PaymentData( $donation_id, $this );
 
 				$gateway->set_payment_method( $this->payment_method );
 
@@ -183,5 +191,14 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get transaction description setting.
+	 *
+	 * @return string
+	 */
+	public function get_transaction_description() {
+		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ) );
 	}
 }
