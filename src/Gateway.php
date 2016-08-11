@@ -77,7 +77,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			'desc'    => sprintf( __( 'Available tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code>', '{donation_id}' ) ),
 			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
 			'type'    => 'text',
-			'default' => __( 'Give transaction {donation_id}', 'pronamic_ideal' ),
+			'default' => __( 'Give donation {donation_id}', 'pronamic_ideal' ),
 		);
 
 		return $settings;
