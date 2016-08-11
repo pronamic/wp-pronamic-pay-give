@@ -50,9 +50,15 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	 * @since   1.0.0
 	 */
 	public function gateway_settings( $settings ) {
+		$description = '';
+
+		if ( 'pronamic_pay' === $this->id ) {
+			$description = __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' );
+		}
+
 		$settings[] = array(
 			'name' => $this->name,
-			'desc' => '',
+			'desc' => $description,
 			'id'   => sprintf( 'give_title_%s', $this->id ),
 			'type' => 'give_title',
 		);
