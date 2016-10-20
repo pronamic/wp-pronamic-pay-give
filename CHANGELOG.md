@@ -7,6 +7,12 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.0.3] - 2016-10-20
+- Use 'donation' instead of 'transaction' in transaction description.
+- Added Pronamic gateway usage clarification.
+- Added transaction description setting.
+- Use new Bancontact label and constant.
+
 ## [1.0.2] - 2016-06-08
 - Fixed text domain `give` = `pronamic_ideal`.
 
@@ -18,6 +24,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2016-03-23
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/give/compare/1.0.2...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/give/compare/1.0.3...HEAD
+[1.0.3]: https://github.com/wp-pay-extensions/give/compare/1.0.2...1.0.3
 [1.0.2]: https://github.com/wp-pay-extensions/give/compare/1.0.1...1.0.2
 [1.0.1]: https://github.com/wp-pay-extensions/give/compare/1.0.0...1.0.1
