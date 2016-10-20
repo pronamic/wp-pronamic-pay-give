@@ -7,17 +7,19 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.1
+ * @version 1.0.3
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_PaymentData {
 	/**
-	 * The donation ID
+	 * The donation ID.
 	 */
 	private $donation_id;
 
 	/**
-	 * The gateway
+	 * The gateway.
+	 *
+	 * @since 1.0.3
 	 */
 	private $gateway;
 

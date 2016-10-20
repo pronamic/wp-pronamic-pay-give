@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.1
+ * @version 1.0.3
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_MisterCashGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {

@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.2
+ * @version 1.0.3
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_Gateway {
@@ -202,6 +202,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	/**
 	 * Get transaction description setting.
 	 *
+	 * @since 1.0.3
 	 * @return string
 	 */
 	public function get_transaction_description() {
