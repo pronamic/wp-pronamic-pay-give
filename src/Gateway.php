@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.3
+ * @version 1.0.4
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_Gateway {

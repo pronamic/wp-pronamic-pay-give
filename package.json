@@ -1,6 +1,6 @@
 {
   "name": "give",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Give driver for the WordPress payment processing library.",
   "repository": {
     "type": "git",
