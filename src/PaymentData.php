@@ -139,6 +139,22 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 		return give_get_payment_user_email( $this->donation_id );
 	}
 
+	public function get_first_name() {
+		$user_info = give_get_payment_meta_user_info( $this->donation_id );
+
+		if ( isset( $user_info['first_name'] ) ) {
+			return $user_info['first_name'];
+		}
+	}
+
+	public function get_last_name() {
+		$user_info = give_get_payment_meta_user_info( $this->donation_id );
+
+		if ( isset( $user_info['last_name'] ) ) {
+			return $user_info['last_name'];
+		}
+	}
+
 	public function get_customer_name() {
 		$user_info = give_get_payment_meta_user_info( $this->donation_id );
 
