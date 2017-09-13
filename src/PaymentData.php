@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.0.3
+ * @version 1.0.6
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_PaymentData {
@@ -137,6 +137,22 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 
 	public function get_email() {
 		return give_get_payment_user_email( $this->donation_id );
+	}
+
+	public function get_first_name() {
+		$user_info = give_get_payment_meta_user_info( $this->donation_id );
+
+		if ( isset( $user_info['first_name'] ) ) {
+			return $user_info['first_name'];
+		}
+	}
+
+	public function get_last_name() {
+		$user_info = give_get_payment_meta_user_info( $this->donation_id );
+
+		if ( isset( $user_info['last_name'] ) ) {
+			return $user_info['last_name'];
+		}
 	}
 
 	public function get_customer_name() {
