@@ -120,7 +120,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	 *
 	 * @return void
 	 */
-	public process_purchase( $purchase_data ) {
+	public function process_purchase( $purchase_data ) {
 		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'give-gateway' ) ) {
 			wp_die( __( 'Nonce verification has failed', 'pronamic_ideal' ), __( 'Error', 'pronamic_ideal' ), array( 'response' => 403 ) );
 		}
