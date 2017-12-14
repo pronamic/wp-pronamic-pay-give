@@ -35,9 +35,9 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 
 		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
 		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
-		add_filter( 'pronamic_payment_source_text_' . self::SLUG,   array( __CLASS__, 'source_text' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_description_' . self::SLUG,   array( $this, 'source_description' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_url_' . self::SLUG,   array( $this, 'source_url' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( $this, 'source_description' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( $this, 'source_url' ), 10, 2 );
 	}
 
 	//////////////////////////////////////////////////
@@ -62,7 +62,7 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 			);
 
 			foreach ( $classes as $class ) {
-				$gateway = new $class;
+				$gateway = new $class();
 
 				$this->gateways[ $gateway->id ] = array(
 					'admin_label'    => $gateway->name,
@@ -83,15 +83,15 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	 */
 	public static function redirect_url( $url, $payment ) {
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
+			case Pronamic_WP_Pay_Statuses::CANCELLED:
 				$url = give_get_failed_transaction_uri();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
+			case Pronamic_WP_Pay_Statuses::FAILURE:
 				$url = give_get_failed_transaction_uri();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
+			case Pronamic_WP_Pay_Statuses::SUCCESS:
 				$url = give_get_success_page_uri();
 
 				break;
@@ -110,23 +110,23 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 		$donation_id = $payment->get_source_id();
 
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
+			case Pronamic_WP_Pay_Statuses::CANCELLED:
 				give_update_payment_status( $donation_id, 'cancelled' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED :
+			case Pronamic_WP_Pay_Statuses::EXPIRED:
 				give_update_payment_status( $donation_id, 'abandoned' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
+			case Pronamic_WP_Pay_Statuses::FAILURE:
 				give_update_payment_status( $donation_id, 'failed' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
+			case Pronamic_WP_Pay_Statuses::SUCCESS:
 				give_update_payment_status( $donation_id, 'publish' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::OPEN :
+			case Pronamic_WP_Pay_Statuses::OPEN:
 			default:
 				give_update_payment_status( $donation_id, 'pending' );
 
@@ -140,13 +140,12 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	 * Source column
 	 */
 	public static function source_text( $text, Pronamic_WP_Pay_Payment $payment ) {
-		$text  = '';
-
-		$text .= __( 'Give', 'pronamic_ideal' ) . '<br />';
+		$text = __( 'Give', 'pronamic_ideal' ) . '<br />';
 
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
 			get_edit_post_link( $payment->source_id ),
+			/* translators: %s: source id */
 			sprintf( __( 'Donation %s', 'pronamic_ideal' ), $payment->source_id )
 		);
 

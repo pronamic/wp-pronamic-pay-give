@@ -74,7 +74,10 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 
 		$settings[] = array(
 			'name'    => __( 'Transaction description', 'pronamic_ideal' ),
-			'desc'    => sprintf( __( 'Available tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code>', '{donation_id}' ) ),
+			'desc'    => sprintf(
+				/* translators: %s: <code>{donation_id}</code> */
+				__( 'Available tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code>', '{donation_id}' )
+			),
 			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
 			'type'    => 'text',
 			'default' => __( 'Give donation {donation_id}', 'pronamic_ideal' ),
@@ -83,7 +86,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 		return $settings;
 	}
 
-	function info_fields( $form_id ) {
+	public function info_fields( $form_id ) {
 		$payment_mode = give_get_chosen_gateway( $form_id );
 
 		if ( $this->id === $payment_mode ) {
@@ -117,7 +120,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	 *
 	 * @return void
 	 */
-	function process_purchase( $purchase_data ) {
+	public process_purchase( $purchase_data ) {
 		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'give-gateway' ) ) {
 			wp_die( __( 'Nonce verification has failed', 'pronamic_ideal' ), __( 'Error', 'pronamic_ideal' ), array( 'response' => 403 ) );
 		}
@@ -148,8 +151,9 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			give_record_gateway_error(
 				__( 'Payment Error', 'pronamic_ideal' ),
 				sprintf(
+					/* translators: %s: payment data as JSON */
 					__( 'Payment creation failed before sending buyer to payment provider. Payment data: %s', 'pronamic_ideal' ),
-					json_encode( $payment_data )
+					wp_json_encode( $payment_data )
 				),
 				$donation_id
 			);

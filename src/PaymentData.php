@@ -34,7 +34,7 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 		parent::__construct();
 
 		$this->donation_id = $donation_id;
-		$this->gateway = $gateway;
+		$this->gateway     = $gateway;
 	}
 
 	//////////////////////////////////////////////////
@@ -56,7 +56,11 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 	//////////////////////////////////////////////////
 
 	public function get_title() {
-		return sprintf( __( 'Give donation %s', 'pronamic_ideal' ), $this->get_order_id() );
+		return sprintf(
+			/* translators: %s: order id */
+			__( 'Give donation %s', 'pronamic_ideal' ),
+			$this->get_order_id()
+		);
 	}
 
 	/**
