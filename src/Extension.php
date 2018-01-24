@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
  * Title: Give extension
@@ -77,8 +78,9 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	/**
 	 * Payment redirect URL filter.
 	 *
-	 * @param string                  $url
-	 * @param Pronamic_WP_Pay_Payment $payment
+	 * @param string  $url
+	 * @param Payment $payment
+	 *
 	 * @return string
 	 */
 	public static function redirect_url( $url, $payment ) {
@@ -139,7 +141,7 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	/**
 	 * Source column
 	 */
-	public static function source_text( $text, Pronamic_WP_Pay_Payment $payment ) {
+	public static function source_text( $text, Payment $payment ) {
 		$text = __( 'Give', 'pronamic_ideal' ) . '<br />';
 
 		$text .= sprintf(

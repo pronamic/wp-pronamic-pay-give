@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: Give gateway
@@ -68,7 +69,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			'desc'    => '',
 			'id'      => sprintf( 'give_%s_configuration', $this->id ),
 			'type'    => 'select',
-			'options' => Pronamic_WP_Pay_Plugin::get_config_select_options( $this->payment_method ),
+			'options' => Plugin::get_config_select_options( $this->payment_method ),
 			'default' => get_option( 'pronamic_pay_config_id' ),
 		);
 
@@ -94,14 +95,14 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
 				printf(
 					'<div class="give_error">%s</div>',
-					Pronamic_WP_Pay_Plugin::get_default_error_message()
+					Plugin::get_default_error_message()
 				);
 			}
 
 			// Gateway
 			$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
 
-			$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $config_id );
+			$gateway = Plugin::get_gateway( $config_id );
 
 			if ( $gateway ) {
 				$gateway->set_payment_method( $this->payment_method );
@@ -167,7 +168,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 		} else {
 			$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
 
-			$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $config_id );
+			$gateway = Plugin::get_gateway( $config_id );
 
 			if ( $gateway ) {
 				// Data
@@ -175,7 +176,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 
 				$gateway->set_payment_method( $this->payment_method );
 
-				$payment = Pronamic_WP_Pay_Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+				$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
 
 				$error = $gateway->get_error();
 
