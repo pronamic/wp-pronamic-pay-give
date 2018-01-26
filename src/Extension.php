@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
@@ -85,15 +86,15 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	 */
 	public static function redirect_url( $url, $payment ) {
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED:
+			case Statuses::CANCELLED:
 				$url = give_get_failed_transaction_uri();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE:
+			case Statuses::FAILURE:
 				$url = give_get_failed_transaction_uri();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS:
+			case Statuses::SUCCESS:
 				$url = give_get_success_page_uri();
 
 				break;
@@ -112,23 +113,23 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 		$donation_id = $payment->get_source_id();
 
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED:
+			case Statuses::CANCELLED:
 				give_update_payment_status( $donation_id, 'cancelled' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED:
+			case Statuses::EXPIRED:
 				give_update_payment_status( $donation_id, 'abandoned' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE:
+			case Statuses::FAILURE:
 				give_update_payment_status( $donation_id, 'failed' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS:
+			case Statuses::SUCCESS:
 				give_update_payment_status( $donation_id, 'publish' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::OPEN:
+			case Statuses::OPEN:
 			default:
 				give_update_payment_status( $donation_id, 'pending' );
 

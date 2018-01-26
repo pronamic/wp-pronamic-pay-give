@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Give iDEAL gateway
@@ -18,7 +19,7 @@ class Pronamic_WP_Pay_Extensions_Give_IDealGateway extends Pronamic_WP_Pay_Exten
 		parent::__construct(
 			'pronamic_pay_ideal',
 			__( 'iDEAL', 'pronamic_ideal' ),
-			Pronamic_WP_Pay_PaymentMethods::IDEAL
+			PaymentMethods::IDEAL
 		);
 	}
 }

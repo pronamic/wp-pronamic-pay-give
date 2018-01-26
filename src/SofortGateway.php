@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Give Sofort gateway
@@ -18,7 +19,7 @@ class Pronamic_WP_Pay_Extensions_Give_SofortGateway extends Pronamic_WP_Pay_Exte
 		parent::__construct(
 			'pronamic_pay_sofort',
 			__( 'SOFORT Banking', 'pronamic_ideal' ),
-			Pronamic_WP_Pay_PaymentMethods::SOFORT
+			PaymentMethods::SOFORT
 		);
 	}
 }

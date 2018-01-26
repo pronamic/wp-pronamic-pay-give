@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Give Bank Transfer gateway
@@ -18,7 +19,7 @@ class Pronamic_WP_Pay_Extensions_Give_BankTransferGateway extends Pronamic_WP_Pa
 		parent::__construct(
 			'pronamic_pay_bank_transfer',
 			__( 'Bank Transfer', 'pronamic_ideal' ),
-			Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER
+			PaymentMethods::BANK_TRANSFER
 		);
 	}
 }

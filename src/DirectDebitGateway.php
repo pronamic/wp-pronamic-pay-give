@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Give Direct Debit gateway
@@ -18,7 +19,7 @@ class Pronamic_WP_Pay_Extensions_Give_DirectDebitGateway extends Pronamic_WP_Pay
 		parent::__construct(
 			'pronamic_pay_direct_debit',
 			__( 'Direct Debit', 'pronamic_ideal' ),
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT
+			PaymentMethods::DIRECT_DEBIT
 		);
 	}
 }

@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Give Credit Card gateway
@@ -18,7 +19,7 @@ class Pronamic_WP_Pay_Extensions_Give_CreditCardGateway extends Pronamic_WP_Pay_
 		parent::__construct(
 			'pronamic_pay_credit_card',
 			__( 'Credit Card', 'pronamic_ideal' ),
-			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD
+			PaymentMethods::CREDIT_CARD
 		);
 	}
 }

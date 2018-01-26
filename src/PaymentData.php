@@ -1,5 +1,7 @@
 <?php
 use Pronamic\WordPress\Pay\Payments\PaymentData;
+use Pronamic\WordPress\Pay\Payments\Item;
+use Pronamic\WordPress\Pay\Payments\Items;
 
 /**
  * Title: WordPress pay Give payment data
@@ -102,15 +104,15 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends PaymentData {
 	 * Get items
 	 *
 	 * @see Pronamic_Pay_PaymentDataInterface::get_items()
-	 * @return Pronamic_IDeal_Items
+	 * @return Items
 	 */
 	public function get_items() {
 		// Items
-		$items = new Pronamic_IDeal_Items();
+		$items = new Items();
 
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount)
-		$item = new Pronamic_IDeal_Item();
+		$item = new Item();
 		$item->setNumber( $this->get_order_id() );
 		$item->setDescription( $this->get_description() );
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
