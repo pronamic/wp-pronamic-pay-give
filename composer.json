@@ -3,7 +3,7 @@
 	"description": "Give driver for the WordPress payment processing library.",
 	"keywords": ["wordpress", "wp", "pay", "give", "extension", "pronamic"],
 	"homepage": "http://www.wp-pay.org/extensions/give/",
-	"license": "GPL-3.0+",
+	"license": "GPL-3.0-or-later",
 	"authors": [
 		{
 			"name": "Pronamic",
