@@ -1,4 +1,5 @@
 <?php
+
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -38,7 +39,11 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 
 		add_action( 'give_gateway_' . $this->id, array( $this, 'process_purchase' ) );
 
-		add_action( 'give_purchase_form_before_submit', array( $this, 'info_fields' ) );
+		if ( defined( 'GIVE_VERSION' ) && version_compare( GIVE_VERSION, '1.7', '>=' ) ) {
+			add_action( 'give_donation_form_before_submit', array( $this, 'info_fields' ) );
+		} else {
+			add_action( 'give_purchase_form_before_submit', array( $this, 'info_fields' ) );
+		}
 
 		add_action( 'give_' . $this->id . '_cc_form', '__return_false' );
 	}
