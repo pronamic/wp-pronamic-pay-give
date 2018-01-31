@@ -1,5 +1,7 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\Give;
+
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -8,11 +10,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.0.4
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_Give_Gateway {
+class Gateway {
 	/**
 	 * The payment method
 	 *
@@ -51,7 +53,8 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	/**
 	 * Register gateway settings.
 	 *
-	 * @param   array   $settings
+	 * @param   array $settings
+	 *
 	 * @return  array
 	 * @since   1.0.0
 	 */
@@ -98,7 +101,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 		if ( $this->id === $payment_mode ) {
 			// Errors
 			if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
-				printf(
+				printf( // WPCS: XSS ok.
 					'<div class="give_error">%s</div>',
 					Plugin::get_default_error_message()
 				);
@@ -112,7 +115,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			if ( $gateway ) {
 				$gateway->set_payment_method( $this->payment_method );
 
-				echo $gateway->get_input_html();
+				echo $gateway->get_input_html(); // WPCS: XSS ok.
 			}
 		}
 	}
@@ -128,7 +131,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	 */
 	public function process_purchase( $purchase_data ) {
 		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'give-gateway' ) ) {
-			wp_die( __( 'Nonce verification has failed', 'pronamic_ideal' ), __( 'Error', 'pronamic_ideal' ), array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Nonce verification has failed', 'pronamic_ideal' ), esc_html__( 'Error', 'pronamic_ideal' ), array( 'response' => 403 ) );
 		}
 
 		$form_id = intval( $purchase_data['post_data']['give-form-id'] );
@@ -177,7 +180,7 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 
 			if ( $gateway ) {
 				// Data
-				$data = new Pronamic_WP_Pay_Extensions_Give_PaymentData( $donation_id, $this );
+				$data = new PaymentData( $donation_id, $this );
 
 				$gateway->set_payment_method( $this->payment_method );
 

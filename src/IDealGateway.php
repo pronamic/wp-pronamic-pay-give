@@ -1,4 +1,7 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\Give;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
@@ -7,11 +10,11 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.0.1
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_Give_IDealGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {
+class IDealGateway extends Gateway {
 	/**
 	 * Constructs and initialize iDEAL gateway.
 	 */

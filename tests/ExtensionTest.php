@@ -15,6 +15,6 @@ class Pronamic_WP_Pay_Extensions_Give_ExtensionTest extends PHPUnit_Framework_Te
 	 * Test class.
 	 */
 	public function test_class() {
-		$this->assertTrue( class_exists( 'Pronamic_WP_Pay_Extensions_Give_Extension' ) );
+		$this->assertTrue( class_exists( 'Pronamic\WordPress\Pay\Extensions\Give\Extension' ) );
 	}
 }

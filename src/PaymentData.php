@@ -1,5 +1,8 @@
 <?php
-use Pronamic\WordPress\Pay\Payments\PaymentData;
+
+namespace Pronamic\WordPress\Pay\Extensions\Give;
+
+use Pronamic\WordPress\Pay\Payments\PaymentData as Core_PaymentData;
 use Pronamic\WordPress\Pay\Payments\Item;
 use Pronamic\WordPress\Pay\Payments\Items;
 
@@ -9,11 +12,11 @@ use Pronamic\WordPress\Pay\Payments\Items;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.0.6
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_Give_PaymentData extends PaymentData {
+class PaymentData extends Core_PaymentData {
 	/**
 	 * The donation ID.
 	 */
@@ -29,9 +32,10 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends PaymentData {
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initializes an Charitable payment data object.
+	 * Constructs and initializes an Give payment data object.
 	 *
-	 * @param mixed $processor
+	 * @param $donation_id
+	 * @param $gateway
 	 */
 	public function __construct( $donation_id, $gateway ) {
 		parent::__construct();
@@ -218,11 +222,15 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends PaymentData {
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
 	 * @return string
 	 */
-	public function get_normal_return_url() {}
+	public function get_normal_return_url() {
+	}
 
-	public function get_cancel_url() {}
+	public function get_cancel_url() {
+	}
 
-	public function get_success_url() {}
+	public function get_success_url() {
+	}
 
-	public function get_error_url() {}
+	public function get_error_url() {
+	}
 }
