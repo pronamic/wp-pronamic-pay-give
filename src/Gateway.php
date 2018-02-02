@@ -108,7 +108,7 @@ class Gateway {
 			}
 
 			// Gateway
-			$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
+			$config_id = $this->get_config_id();
 
 			$gateway = Plugin::get_gateway( $config_id );
 
@@ -174,7 +174,7 @@ class Gateway {
 				'payment-mode'  => $purchase_data['post_data']['give-gateway'],
 			) );
 		} else {
-			$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
+			$config_id = $this->get_config_id();
 
 			$gateway = Plugin::get_gateway( $config_id );
 
@@ -220,5 +220,21 @@ class Gateway {
 	 */
 	public function get_transaction_description() {
 		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ) );
+	}
+
+	/**
+	 * Get config ID.
+	 *
+	 * @return mixed
+	 */
+	protected function get_config_id() {
+		$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
+
+		if ( '' === $config_id ) {
+			// Use default gateway if no configuration has been set.
+			$config_id = get_option( 'pronamic_pay_config_id' );
+		}
+
+		return $config_id;
 	}
 }
