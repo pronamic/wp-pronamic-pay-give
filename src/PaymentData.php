@@ -29,8 +29,6 @@ class PaymentData extends Core_PaymentData {
 	 */
 	private $gateway;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initializes an Give payment data object.
 	 *
@@ -43,8 +41,6 @@ class PaymentData extends Core_PaymentData {
 		$this->donation_id = $donation_id;
 		$this->gateway     = $gateway;
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get source indicator
@@ -59,8 +55,6 @@ class PaymentData extends Core_PaymentData {
 	public function get_source_id() {
 		return $this->donation_id;
 	}
-
-	//////////////////////////////////////////////////
 
 	public function get_title() {
 		return sprintf(
@@ -128,10 +122,6 @@ class PaymentData extends Core_PaymentData {
 		return $items;
 	}
 
-	//////////////////////////////////////////////////
-	// Currency
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get currency
 	 *
@@ -141,10 +131,6 @@ class PaymentData extends Core_PaymentData {
 	public function get_currency_alphabetic_code() {
 		return give_get_payment_currency_code( $this->donation_id );
 	}
-
-	//////////////////////////////////////////////////
-	// Customer
-	//////////////////////////////////////////////////
 
 	public function get_email() {
 		return give_get_payment_user_email( $this->donation_id );
@@ -211,10 +197,6 @@ class PaymentData extends Core_PaymentData {
 
 		return $zip;
 	}
-
-	//////////////////////////////////////////////////
-	// URL's
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get normal return URL.

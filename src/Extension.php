@@ -23,8 +23,6 @@ class Extension {
 	 */
 	const SLUG = 'give';
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Bootstrap
 	 */
@@ -44,8 +42,6 @@ class Extension {
 		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( $this, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( $this, 'source_url' ), 10, 2 );
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Give payments gateways.
@@ -144,8 +140,6 @@ class Extension {
 				break;
 		}
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Source column

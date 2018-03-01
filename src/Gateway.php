@@ -22,8 +22,6 @@ class Gateway {
 	 */
 	protected $payment_method;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initialize a gateway.
 	 *
