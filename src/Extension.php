@@ -2,6 +2,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
@@ -41,6 +42,8 @@ class Extension {
 		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( $this, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( $this, 'source_url' ), 10, 2 );
+
+		add_filter( 'give_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
 	}
 
 	/**
@@ -63,6 +66,10 @@ class Extension {
 				'IDealGateway',
 				'SofortGateway',
 			);
+
+			if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
+				$classes[] = 'GuldenGateway';
+			}
 
 			foreach ( $classes as $class ) {
 				$class = __NAMESPACE__ . '\\' . $class;
@@ -139,6 +146,30 @@ class Extension {
 
 				break;
 		}
+	}
+
+	/**
+	 * Filter currencies.
+	 *
+	 * @param array $currencies Available currencies.
+	 *
+	 * @return mixed
+	 */
+	public static function currencies( $currencies ) {
+		if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
+			$currencies['NLG'] = array(
+				'admin_label' => PaymentMethods::get_name( PaymentMethods::GULDEN ) . ' (G)',
+				'symbol'      => 'G',
+				'setting'     => array(
+					'currency_position'   => 'before',
+					'thousands_separator' => '',
+					'decimal_separator'   => '.',
+					'number_decimals'     => 4,
+				),
+			);
+		}
+
+		return $currencies;
 	}
 
 	/**
