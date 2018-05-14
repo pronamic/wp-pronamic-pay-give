@@ -13,7 +13,7 @@ use Pronamic\WordPress\Pay\Payments\Items;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 1.0.6
+ * @version 2.0.0
  * @since   1.0.0
  */
 class PaymentData extends Core_PaymentData {
