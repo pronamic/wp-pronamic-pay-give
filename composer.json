@@ -3,7 +3,7 @@
 	"description": "Give driver for the WordPress payment processing library.",
 	"keywords": ["wordpress", "wp", "pay", "give", "extension", "pronamic"],
 	"homepage": "http://www.wp-pay.org/extensions/give/",
-	"license": "GPL-3.0+",
+	"license": "GPL-3.0-or-later",
 	"authors": [
 		{
 			"name": "Pronamic",
@@ -24,36 +24,25 @@
 		"source": "https://github.com/wp-pay-extensions/give"
 	},
 	"autoload": {
-		"classmap": ["src/"]
-	},
-	"repositories":[
-		{
-			"type": "composer",
-			"url": "https://wpackagist.org/"
+		"psr-4": {
+			"Pronamic\\WordPress\\Pay\\Extensions\\Give\\": "src/"
 		}
-	],
+	},
+	"config": {
+		"platform": {
+			"php": "5.3.3"
+		}
+	},
 	"require": {
-		"php": ">=5.2.4",
-		"xrstf/composer-php52": "1.*",
-		"wp-pay/core": "^1.3"
+		"php": "^5.3",
+		"wp-pay/core": "^2.0"
 	},
 	"require-dev": {
+		"php-coveralls/php-coveralls": "^1.0",
 		"phpmd/phpmd": "^2.2.3",
-		"satooshi/php-coveralls": "^0.7.1",
+		"phpunit/phpunit": "^4.5",
 		"squizlabs/php_codesniffer": "^2.7",
-		"wp-coding-standards/wpcs": "^0.10.0",
-		"wp-cli/wp-cli": "^0.21.1"
-	},
-	"scripts": {
-		"post-install-cmd": [
-			"xrstf\\Composer52\\Generator::onPostInstallCmd"
-		],
-		"post-update-cmd": [
-			"xrstf\\Composer52\\Generator::onPostInstallCmd"
-		],
-		"post-autoload-dump": [
-			"xrstf\\Composer52\\Generator::onPostInstallCmd",
-			"bin/install-wpcs"
-		]
+		"wp-coding-standards/wpcs": "^0.14.0",
+		"wimg/php-compatibility": "^8.0"
 	}
 }

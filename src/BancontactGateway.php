@@ -5,7 +5,7 @@ namespace Pronamic\WordPress\Pay\Extensions\Give;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
- * Title: Give Direct Debit gateway
+ * Title: Give Bancontact gateway
  * Description:
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
@@ -14,15 +14,15 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * @version 2.0.0
  * @since   1.0.0
  */
-class DirectDebitGateway extends Gateway {
+class BancontactGateway extends Gateway {
 	/**
-	 * Constructs and initialize Direct Debit gateway.
+	 * Constructs and initialize Bancontact gateway.
 	 */
 	public function __construct() {
 		parent::__construct(
-			'pronamic_pay_direct_debit',
-			__( 'Direct Debit', 'pronamic_ideal' ),
-			PaymentMethods::DIRECT_DEBIT
+			'pronamic_pay_mister_cash',
+			__( 'Bancontact', 'pronamic_ideal' ),
+			PaymentMethods::BANCONTACT
 		);
 	}
 }

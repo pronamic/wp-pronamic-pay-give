@@ -5,24 +5,24 @@ namespace Pronamic\WordPress\Pay\Extensions\Give;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
- * Title: Give Direct Debit gateway
+ * Title: Give Gulden gateway
  * Description:
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
  * @version 2.0.0
- * @since   1.0.0
+ * @since   2.0.0
  */
-class DirectDebitGateway extends Gateway {
+class GuldenGateway extends Gateway {
 	/**
-	 * Constructs and initialize Direct Debit gateway.
+	 * Constructs and initialize Gulden gateway.
 	 */
 	public function __construct() {
 		parent::__construct(
-			'pronamic_pay_direct_debit',
-			__( 'Direct Debit', 'pronamic_ideal' ),
-			PaymentMethods::DIRECT_DEBIT
+			'pronamic_pay_gulden',
+			PaymentMethods::get_name( PaymentMethods::GULDEN ),
+			PaymentMethods::GULDEN
 		);
 	}
 }

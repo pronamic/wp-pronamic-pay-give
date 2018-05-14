@@ -1,16 +1,20 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\Give;
+
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+
 /**
  * Title: Give Sofort gateway
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
- * @version 1.0.1
- * @since 1.0.0
+ * @author  Reüel van der Steege
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_Give_SofortGateway extends Pronamic_WP_Pay_Extensions_Give_Gateway {
+class SofortGateway extends Gateway {
 	/**
 	 * Constructs and initialize Sofort gateway.
 	 */
@@ -18,7 +22,7 @@ class Pronamic_WP_Pay_Extensions_Give_SofortGateway extends Pronamic_WP_Pay_Exte
 		parent::__construct(
 			'pronamic_pay_sofort',
 			__( 'SOFORT Banking', 'pronamic_ideal' ),
-			Pronamic_WP_Pay_PaymentMethods::SOFORT
+			PaymentMethods::SOFORT
 		);
 	}
 }

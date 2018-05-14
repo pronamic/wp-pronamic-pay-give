@@ -1,24 +1,26 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\Give;
+
+use Pronamic\WordPress\Pay\Plugin;
+
 /**
  * Title: Give gateway
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
- * @version 1.0.4
- * @since 1.0.0
+ * @author  Reüel van der Steege
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_Give_Gateway {
+class Gateway {
 	/**
 	 * The payment method
 	 *
 	 * @var string
 	 */
 	protected $payment_method;
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Constructs and initialize a gateway.
@@ -37,7 +39,11 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 
 		add_action( 'give_gateway_' . $this->id, array( $this, 'process_purchase' ) );
 
-		add_action( 'give_purchase_form_before_submit', array( $this, 'info_fields' ) );
+		if ( defined( 'GIVE_VERSION' ) && version_compare( GIVE_VERSION, '1.7', '>=' ) ) {
+			add_action( 'give_donation_form_before_submit', array( $this, 'info_fields' ) );
+		} else {
+			add_action( 'give_purchase_form_before_submit', array( $this, 'info_fields' ) );
+		}
 
 		add_action( 'give_' . $this->id . '_cc_form', '__return_false' );
 	}
@@ -45,7 +51,8 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	/**
 	 * Register gateway settings.
 	 *
-	 * @param   array   $settings
+	 * @param   array $settings
+	 *
 	 * @return  array
 	 * @since   1.0.0
 	 */
@@ -68,13 +75,16 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			'desc'    => '',
 			'id'      => sprintf( 'give_%s_configuration', $this->id ),
 			'type'    => 'select',
-			'options' => Pronamic_WP_Pay_Plugin::get_config_select_options( $this->payment_method ),
+			'options' => Plugin::get_config_select_options( $this->payment_method ),
 			'default' => get_option( 'pronamic_pay_config_id' ),
 		);
 
 		$settings[] = array(
 			'name'    => __( 'Transaction description', 'pronamic_ideal' ),
-			'desc'    => sprintf( __( 'Available tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code>', '{donation_id}' ) ),
+			'desc'    => sprintf(
+				/* translators: %s: <code>{donation_id}</code> */
+				__( 'Available tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code>', '{donation_id}' )
+			),
 			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
 			'type'    => 'text',
 			'default' => __( 'Give donation {donation_id}', 'pronamic_ideal' ),
@@ -83,27 +93,27 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 		return $settings;
 	}
 
-	function info_fields( $form_id ) {
+	public function info_fields( $form_id ) {
 		$payment_mode = give_get_chosen_gateway( $form_id );
 
 		if ( $this->id === $payment_mode ) {
 			// Errors
 			if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
-				printf(
+				printf( // WPCS: XSS ok.
 					'<div class="give_error">%s</div>',
-					Pronamic_WP_Pay_Plugin::get_default_error_message()
+					Plugin::get_default_error_message()
 				);
 			}
 
 			// Gateway
-			$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
+			$config_id = $this->get_config_id();
 
-			$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $config_id );
+			$gateway = Plugin::get_gateway( $config_id );
 
 			if ( $gateway ) {
 				$gateway->set_payment_method( $this->payment_method );
 
-				echo $gateway->get_input_html();
+				echo $gateway->get_input_html(); // WPCS: XSS ok.
 			}
 		}
 	}
@@ -117,9 +127,9 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	 *
 	 * @return void
 	 */
-	function process_purchase( $purchase_data ) {
+	public function process_purchase( $purchase_data ) {
 		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'give-gateway' ) ) {
-			wp_die( __( 'Nonce verification has failed', 'pronamic_ideal' ), __( 'Error', 'pronamic_ideal' ), array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Nonce verification has failed', 'pronamic_ideal' ), esc_html__( 'Error', 'pronamic_ideal' ), array( 'response' => 403 ) );
 		}
 
 		$form_id = intval( $purchase_data['post_data']['give-form-id'] );
@@ -148,8 +158,9 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 			give_record_gateway_error(
 				__( 'Payment Error', 'pronamic_ideal' ),
 				sprintf(
+					/* translators: %s: payment data as JSON */
 					__( 'Payment creation failed before sending buyer to payment provider. Payment data: %s', 'pronamic_ideal' ),
-					json_encode( $payment_data )
+					wp_json_encode( $payment_data )
 				),
 				$donation_id
 			);
@@ -161,17 +172,17 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 				'payment-mode'  => $purchase_data['post_data']['give-gateway'],
 			) );
 		} else {
-			$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
+			$config_id = $this->get_config_id();
 
-			$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $config_id );
+			$gateway = Plugin::get_gateway( $config_id );
 
 			if ( $gateway ) {
 				// Data
-				$data = new Pronamic_WP_Pay_Extensions_Give_PaymentData( $donation_id, $this );
+				$data = new PaymentData( $donation_id, $this );
 
 				$gateway->set_payment_method( $this->payment_method );
 
-				$payment = Pronamic_WP_Pay_Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+				$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
 
 				$error = $gateway->get_error();
 
@@ -207,5 +218,21 @@ class Pronamic_WP_Pay_Extensions_Give_Gateway {
 	 */
 	public function get_transaction_description() {
 		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ) );
+	}
+
+	/**
+	 * Get config ID.
+	 *
+	 * @return mixed
+	 */
+	protected function get_config_id() {
+		$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
+
+		if ( '' === $config_id ) {
+			// Use default gateway if no configuration has been set.
+			$config_id = get_option( 'pronamic_pay_config_id' );
+		}
+
+		return $config_id;
 	}
 }

@@ -1,24 +1,28 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\Give;
+
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Core\Statuses;
+use Pronamic\WordPress\Pay\Payments\Payment;
+
 /**
  * Title: Give extension
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
- * @version 1.0.5
- * @since 1.0.0
+ * @author  Reüel van der Steege
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_Give_Extension {
+class Extension {
 	/**
 	 * Slug
 	 *
 	 * @var string
 	 */
 	const SLUG = 'give';
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Bootstrap
@@ -35,34 +39,42 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 
 		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
 		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
-		add_filter( 'pronamic_payment_source_text_' . self::SLUG,   array( __CLASS__, 'source_text' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_description_' . self::SLUG,   array( $this, 'source_description' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_url_' . self::SLUG,   array( $this, 'source_url' ), 10, 2 );
-	}
+		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( $this, 'source_description' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( $this, 'source_url' ), 10, 2 );
 
-	//////////////////////////////////////////////////
+		add_filter( 'give_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
+	}
 
 	/**
 	 * Give payments gateways.
 	 *
 	 * @see https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L37
+	 *
 	 * @param array $gateways
-	 * @retrun array
+	 *
+	 * @return array
 	 */
 	public function give_payment_gateways( $gateways ) {
 		if ( ! isset( $this->gateways ) ) {
 			$classes = array(
-				'Pronamic_WP_Pay_Extensions_Give_Gateway',
-				'Pronamic_WP_Pay_Extensions_Give_BankTransferGateway',
-				'Pronamic_WP_Pay_Extensions_Give_CreditCardGateway',
-				'Pronamic_WP_Pay_Extensions_Give_DirectDebitGateway',
-				'Pronamic_WP_Pay_Extensions_Give_IDealGateway',
-				'Pronamic_WP_Pay_Extensions_Give_MisterCashGateway',
-				'Pronamic_WP_Pay_Extensions_Give_SofortGateway',
+				'Gateway',
+				'BancontactGateway',
+				'BankTransferGateway',
+				'CreditCardGateway',
+				'DirectDebitGateway',
+				'IDealGateway',
+				'SofortGateway',
 			);
 
+			if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
+				$classes[] = 'GuldenGateway';
+			}
+
 			foreach ( $classes as $class ) {
-				$gateway = new $class;
+				$class = __NAMESPACE__ . '\\' . $class;
+
+				$gateway = new $class();
 
 				$this->gateways[ $gateway->id ] = array(
 					'admin_label'    => $gateway->name,
@@ -77,21 +89,22 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	/**
 	 * Payment redirect URL filter.
 	 *
-	 * @param string                  $url
-	 * @param Pronamic_WP_Pay_Payment $payment
+	 * @param string  $url
+	 * @param Payment $payment
+	 *
 	 * @return string
 	 */
 	public static function redirect_url( $url, $payment ) {
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
+			case Statuses::CANCELLED:
 				$url = give_get_failed_transaction_uri();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
+			case Statuses::FAILURE:
 				$url = give_get_failed_transaction_uri();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
+			case Statuses::SUCCESS:
 				$url = give_get_success_page_uri();
 
 				break;
@@ -104,29 +117,30 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 	 * Update lead status of the specified payment
 	 *
 	 * @see https://github.com/Charitable/Charitable/blob/1.1.4/includes/gateways/class-charitable-gateway-paypal.php#L229-L357
-	 * @param Pronamic_Pay_Payment $payment
+	 *
+	 * @param Payment $payment
 	 */
-	public static function status_update( Pronamic_Pay_Payment $payment ) {
+	public static function status_update( Payment $payment ) {
 		$donation_id = $payment->get_source_id();
 
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
+			case Statuses::CANCELLED:
 				give_update_payment_status( $donation_id, 'cancelled' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED :
+			case Statuses::EXPIRED:
 				give_update_payment_status( $donation_id, 'abandoned' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
+			case Statuses::FAILURE:
 				give_update_payment_status( $donation_id, 'failed' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
+			case Statuses::SUCCESS:
 				give_update_payment_status( $donation_id, 'publish' );
 
 				break;
-			case Pronamic_WP_Pay_Statuses::OPEN :
+			case Statuses::OPEN:
 			default:
 				give_update_payment_status( $donation_id, 'pending' );
 
@@ -134,19 +148,45 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 		}
 	}
 
-	//////////////////////////////////////////////////
+	/**
+	 * Filter currencies.
+	 *
+	 * @param array $currencies Available currencies.
+	 *
+	 * @return mixed
+	 */
+	public static function currencies( $currencies ) {
+		if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
+			$currencies['NLG'] = array(
+				'admin_label' => PaymentMethods::get_name( PaymentMethods::GULDEN ) . ' (G)',
+				'symbol'      => 'G',
+				'setting'     => array(
+					'currency_position'   => 'before',
+					'thousands_separator' => '',
+					'decimal_separator'   => '.',
+					'number_decimals'     => 4,
+				),
+			);
+		}
+
+		return $currencies;
+	}
 
 	/**
 	 * Source column
+	 *
+	 * @param         $text
+	 * @param Payment $payment
+	 *
+	 * @return string
 	 */
-	public static function source_text( $text, Pronamic_WP_Pay_Payment $payment ) {
-		$text  = '';
-
-		$text .= __( 'Give', 'pronamic_ideal' ) . '<br />';
+	public static function source_text( $text, Payment $payment ) {
+		$text = __( 'Give', 'pronamic_ideal' ) . '<br />';
 
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
 			get_edit_post_link( $payment->source_id ),
+			/* translators: %s: source id */
 			sprintf( __( 'Donation %s', 'pronamic_ideal' ), $payment->source_id )
 		);
 
@@ -155,19 +195,25 @@ class Pronamic_WP_Pay_Extensions_Give_Extension {
 
 	/**
 	 * Source description.
+	 *
+	 * @param         $description
+	 * @param Payment $payment
+	 *
+	 * @return string
 	 */
-	public function source_description( $description, Pronamic_Pay_Payment $payment ) {
-		$description = __( 'Give Donation', 'pronamic_ideal' );
-
-		return $description;
+	public function source_description( $description, Payment $payment ) {
+		return __( 'Give Donation', 'pronamic_ideal' );
 	}
 
 	/**
 	 * Source URL.
+	 *
+	 * @param         $url
+	 * @param Payment $payment
+	 *
+	 * @return string
 	 */
-	public function source_url( $url, Pronamic_Pay_Payment $payment ) {
-		$url = get_edit_post_link( $payment->source_id );
-
-		return $url;
+	public function source_url( $url, Payment $payment ) {
+		return get_edit_post_link( $payment->source_id );
 	}
 }

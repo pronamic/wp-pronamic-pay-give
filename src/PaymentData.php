@@ -1,16 +1,22 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\Give;
+
+use Pronamic\WordPress\Pay\Payments\PaymentData as Core_PaymentData;
+use Pronamic\WordPress\Pay\Payments\Item;
+use Pronamic\WordPress\Pay\Payments\Items;
+
 /**
  * Title: WordPress pay Give payment data
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
- * @version 1.0.6
- * @since 1.0.0
+ * @author  Reüel van der Steege
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_PaymentData {
+class PaymentData extends Core_PaymentData {
 	/**
 	 * The donation ID.
 	 */
@@ -23,21 +29,18 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 	 */
 	private $gateway;
 
-	//////////////////////////////////////////////////
-
 	/**
-	 * Constructs and initializes an Charitable payment data object.
+	 * Constructs and initializes an Give payment data object.
 	 *
-	 * @param mixed $processor
+	 * @param $donation_id
+	 * @param $gateway
 	 */
 	public function __construct( $donation_id, $gateway ) {
 		parent::__construct();
 
 		$this->donation_id = $donation_id;
-		$this->gateway = $gateway;
+		$this->gateway     = $gateway;
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get source indicator
@@ -53,10 +56,12 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 		return $this->donation_id;
 	}
 
-	//////////////////////////////////////////////////
-
 	public function get_title() {
-		return sprintf( __( 'Give donation %s', 'pronamic_ideal' ), $this->get_order_id() );
+		return sprintf(
+			/* translators: %s: order id */
+			__( 'Give donation %s', 'pronamic_ideal' ),
+			$this->get_order_id()
+		);
 	}
 
 	/**
@@ -97,15 +102,15 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 	 * Get items
 	 *
 	 * @see Pronamic_Pay_PaymentDataInterface::get_items()
-	 * @return Pronamic_IDeal_Items
+	 * @return Items
 	 */
 	public function get_items() {
 		// Items
-		$items = new Pronamic_IDeal_Items();
+		$items = new Items();
 
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount)
-		$item = new Pronamic_IDeal_Item();
+		$item = new Item();
 		$item->setNumber( $this->get_order_id() );
 		$item->setDescription( $this->get_description() );
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
@@ -117,10 +122,6 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 		return $items;
 	}
 
-	//////////////////////////////////////////////////
-	// Currency
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get currency
 	 *
@@ -130,10 +131,6 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 	public function get_currency_alphabetic_code() {
 		return give_get_payment_currency_code( $this->donation_id );
 	}
-
-	//////////////////////////////////////////////////
-	// Customer
-	//////////////////////////////////////////////////
 
 	public function get_email() {
 		return give_get_payment_user_email( $this->donation_id );
@@ -201,21 +198,21 @@ class Pronamic_WP_Pay_Extensions_Give_PaymentData extends Pronamic_WP_Pay_Paymen
 		return $zip;
 	}
 
-	//////////////////////////////////////////////////
-	// URL's
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get normal return URL.
 	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
 	 * @return string
 	 */
-	public function get_normal_return_url() {}
+	public function get_normal_return_url() {
+	}
 
-	public function get_cancel_url() {}
+	public function get_cancel_url() {
+	}
 
-	public function get_success_url() {}
+	public function get_success_url() {
+	}
 
-	public function get_error_url() {}
+	public function get_error_url() {
+	}
 }
