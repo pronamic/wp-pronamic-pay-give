@@ -113,7 +113,7 @@ class PaymentData extends Core_PaymentData {
 		$item = new Item();
 		$item->set_number( $this->get_order_id() );
 		$item->set_description( $this->get_description() );
-		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
+		// @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
 		$item->set_price( give_get_payment_amount( $this->donation_id ) );
 		$item->set_quantity( 1 );
 
@@ -201,7 +201,7 @@ class PaymentData extends Core_PaymentData {
 	/**
 	 * Get normal return URL.
 	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
+	 * @link https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
 	 * @return string
 	 */
 	public function get_normal_return_url() {

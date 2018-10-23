@@ -154,7 +154,7 @@ class Gateway {
 		if ( ! $donation_id ) {
 			// Record the error
 			// /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
-			// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+			// @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
 			give_record_gateway_error(
 				__( 'Payment Error', 'pronamic_ideal' ),
 				sprintf(
@@ -166,7 +166,7 @@ class Gateway {
 			);
 
 			// Problems? send back
-			// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
+			// @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
 			give_send_back_to_checkout( array(
 				'payment-error' => true,
 				'payment-mode'  => $purchase_data['post_data']['give-gateway'],
@@ -189,7 +189,7 @@ class Gateway {
 				if ( is_wp_error( $error ) ) {
 					// Record the error
 					// /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
-					// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+					// @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
 					give_record_gateway_error(
 						__( 'Payment Error', 'pronamic_ideal' ),
 						implode( '<br />', $error->get_error_messages() ),
@@ -197,7 +197,7 @@ class Gateway {
 					);
 
 					// Problems? send back
-					// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
+					// @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
 					give_send_back_to_checkout( array(
 						'payment-error' => true,
 						'payment-mode'  => $purchase_data['post_data']['give-gateway'],
