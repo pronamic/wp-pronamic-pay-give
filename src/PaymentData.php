@@ -117,7 +117,7 @@ class PaymentData extends Core_PaymentData {
 		$item->set_price( give_get_payment_amount( $this->donation_id ) );
 		$item->set_quantity( 1 );
 
-		$items->addItem( $item );
+		$items->add_item( $item );
 
 		return $items;
 	}
