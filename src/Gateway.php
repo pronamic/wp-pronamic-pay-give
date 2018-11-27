@@ -76,7 +76,7 @@ class Gateway {
 			'id'      => sprintf( 'give_%s_configuration', $this->id ),
 			'type'    => 'select',
 			'options' => Plugin::get_config_select_options( $this->payment_method ),
-			'default' => get_option( 'pronamic_pay_config_id' ),
+			'default' => $this->get_config_id(),
 		);
 
 		$settings[] = array(
@@ -235,7 +235,7 @@ class Gateway {
 	protected function get_config_id() {
 		$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
 
-		if ( '' === $config_id ) {
+		if ( empty( $config_id ) ) {
 			// Use default gateway if no configuration has been set.
 			$config_id = get_option( 'pronamic_pay_config_id' );
 		}
