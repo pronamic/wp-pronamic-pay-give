@@ -93,28 +93,35 @@ class Gateway {
 		return $settings;
 	}
 
+	/**
+	 * Info fields.
+	 *
+	 * @param int $form_id Form ID.
+	 */
 	public function info_fields( $form_id ) {
 		$payment_mode = give_get_chosen_gateway( $form_id );
 
-		if ( $this->id === $payment_mode ) {
-			// Errors
-			if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
-				printf( // WPCS: XSS ok.
-					'<div class="give_error">%s</div>',
-					Plugin::get_default_error_message()
-				);
-			}
+		if ( $this->id !== $payment_mode ) {
+			return;
+		}
 
-			// Gateway
-			$config_id = $this->get_config_id();
+		// Errors.
+		if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
+			printf( // WPCS: XSS ok.
+				'<div class="give_error">%s</div>',
+				Plugin::get_default_error_message()
+			);
+		}
 
-			$gateway = Plugin::get_gateway( $config_id );
+		// Gateway.
+		$config_id = $this->get_config_id();
 
-			if ( $gateway ) {
-				$gateway->set_payment_method( $this->payment_method );
+		$gateway = Plugin::get_gateway( $config_id );
 
-				echo $gateway->get_input_html(); // WPCS: XSS ok.
-			}
+		if ( $gateway ) {
+			$gateway->set_payment_method( $this->payment_method );
+
+			echo $gateway->get_input_html(); // WPCS: XSS ok.
 		}
 	}
 
