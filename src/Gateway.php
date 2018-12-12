@@ -11,7 +11,7 @@ use Pronamic\WordPress\Pay\Plugin;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.0.1
  * @since   1.0.0
  */
 class Gateway {
@@ -25,16 +25,16 @@ class Gateway {
 	/**
 	 * Constructs and initialize a gateway.
 	 *
-	 * @param string $id
-	 * @param string $name
-	 * @param string $payment_method
+	 * @param string $id             Gateway ID.
+	 * @param string $name           Gateway name.
+	 * @param string $payment_method Gateway payment method.
 	 */
 	public function __construct( $id = 'pronamic_pay', $name = 'Pronamic', $payment_method = null ) {
 		$this->id             = $id;
 		$this->name           = $name;
 		$this->payment_method = $payment_method;
 
-		// Add filters and actions
+		// Add filters and actions.
 		add_filter( 'give_settings_gateways', array( $this, 'gateway_settings' ) );
 
 		add_action( 'give_gateway_' . $this->id, array( $this, 'process_purchase' ) );
@@ -51,7 +51,7 @@ class Gateway {
 	/**
 	 * Register gateway settings.
 	 *
-	 * @param   array $settings
+	 * @param   array $settings Gateway settings.
 	 *
 	 * @return  array
 	 * @since   1.0.0
@@ -76,14 +76,15 @@ class Gateway {
 			'id'      => sprintf( 'give_%s_configuration', $this->id ),
 			'type'    => 'select',
 			'options' => Plugin::get_config_select_options( $this->payment_method ),
-			'default' => get_option( 'pronamic_pay_config_id' ),
+			'default' => $this->get_config_id(),
 		);
 
 		$settings[] = array(
 			'name'    => __( 'Transaction description', 'pronamic_ideal' ),
 			'desc'    => sprintf(
 				/* translators: %s: <code>{donation_id}</code> */
-				__( 'Available tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code>', '{donation_id}' )
+				__( 'Available tags: %s', 'pronamic_ideal' ),
+				sprintf( '<code>%s</code>', '{donation_id}' )
 			),
 			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
 			'type'    => 'text',
@@ -93,28 +94,35 @@ class Gateway {
 		return $settings;
 	}
 
+	/**
+	 * Info fields.
+	 *
+	 * @param int $form_id Form ID.
+	 */
 	public function info_fields( $form_id ) {
 		$payment_mode = give_get_chosen_gateway( $form_id );
 
-		if ( $this->id === $payment_mode ) {
-			// Errors
-			if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
-				printf( // WPCS: XSS ok.
-					'<div class="give_error">%s</div>',
-					Plugin::get_default_error_message()
-				);
-			}
+		if ( $this->id !== $payment_mode ) {
+			return;
+		}
 
-			// Gateway
-			$config_id = $this->get_config_id();
+		// Errors.
+		if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
+			printf( // WPCS: XSS ok.
+				'<div class="give_error">%s</div>',
+				Plugin::get_default_error_message()
+			);
+		}
 
-			$gateway = Plugin::get_gateway( $config_id );
+		// Gateway.
+		$config_id = $this->get_config_id();
 
-			if ( $gateway ) {
-				$gateway->set_payment_method( $this->payment_method );
+		$gateway = Plugin::get_gateway( $config_id );
 
-				echo $gateway->get_input_html(); // WPCS: XSS ok.
-			}
+		if ( $gateway ) {
+			$gateway->set_payment_method( $this->payment_method );
+
+			echo $gateway->get_input_html(); // WPCS: XSS ok.
 		}
 	}
 
@@ -123,7 +131,7 @@ class Gateway {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $purchase_data Purchase Data
+	 * @param array $purchase_data Purchase Data.
 	 *
 	 * @return void
 	 */
@@ -134,7 +142,7 @@ class Gateway {
 
 		$form_id = intval( $purchase_data['post_data']['give-form-id'] );
 
-		// Collect payment data
+		// Collect payment data.
 		$payment_data = array(
 			'price'           => $purchase_data['price'],
 			'give_form_title' => $purchase_data['post_data']['give-form-title'],
@@ -148,13 +156,15 @@ class Gateway {
 			'gateway'         => $this->id,
 		);
 
-		// Record the pending payment
+		// Record the pending payment.
 		$donation_id = give_insert_payment( $payment_data );
 
 		if ( ! $donation_id ) {
-			// Record the error
-			// /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
-			// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+			/*
+			 * Record the error.
+			 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
+			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+			 */
 			give_record_gateway_error(
 				__( 'Payment Error', 'pronamic_ideal' ),
 				sprintf(
@@ -165,19 +175,23 @@ class Gateway {
 				$donation_id
 			);
 
-			// Problems? send back
-			// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
-			give_send_back_to_checkout( array(
-				'payment-error' => true,
-				'payment-mode'  => $purchase_data['post_data']['give-gateway'],
-			) );
+			/*
+			 * Problems? Send back.
+			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
+			 */
+			give_send_back_to_checkout(
+				array(
+					'payment-error' => true,
+					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
+				)
+			);
 		} else {
 			$config_id = $this->get_config_id();
 
 			$gateway = Plugin::get_gateway( $config_id );
 
 			if ( $gateway ) {
-				// Data
+				// Data.
 				$data = new PaymentData( $donation_id, $this );
 
 				$gateway->set_payment_method( $this->payment_method );
@@ -187,23 +201,29 @@ class Gateway {
 				$error = $gateway->get_error();
 
 				if ( is_wp_error( $error ) ) {
-					// Record the error
-					// /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
-					// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+					/*
+					 * Record the error.
+					 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
+					 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+					 */
 					give_record_gateway_error(
 						__( 'Payment Error', 'pronamic_ideal' ),
 						implode( '<br />', $error->get_error_messages() ),
 						$donation_id
 					);
 
-					// Problems? send back
-					// @see https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
-					give_send_back_to_checkout( array(
-						'payment-error' => true,
-						'payment-mode'  => $purchase_data['post_data']['give-gateway'],
-					) );
+					/*
+					 * Problems? Send back.
+					 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
+					 */
+					give_send_back_to_checkout(
+						array(
+							'payment-error' => true,
+							'payment-mode'  => $purchase_data['post_data']['give-gateway'],
+						)
+					);
 				} else {
-					// Redirect
+					// Redirect.
 					$gateway->redirect( $payment );
 				}
 			}
@@ -228,7 +248,7 @@ class Gateway {
 	protected function get_config_id() {
 		$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
 
-		if ( '' === $config_id ) {
+		if ( empty( $config_id ) ) {
 			// Use default gateway if no configuration has been set.
 			$config_id = get_option( 'pronamic_pay_config_id' );
 		}

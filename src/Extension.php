@@ -49,7 +49,7 @@ class Extension {
 	/**
 	 * Give payments gateways.
 	 *
-	 * @see https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L37
+	 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L37
 	 *
 	 * @param array $gateways
 	 *
@@ -116,7 +116,7 @@ class Extension {
 	/**
 	 * Update lead status of the specified payment
 	 *
-	 * @see https://github.com/Charitable/Charitable/blob/1.1.4/includes/gateways/class-charitable-gateway-paypal.php#L229-L357
+	 * @link https://github.com/Charitable/Charitable/blob/1.1.4/includes/gateways/class-charitable-gateway-paypal.php#L229-L357
 	 *
 	 * @param Payment $payment
 	 */
