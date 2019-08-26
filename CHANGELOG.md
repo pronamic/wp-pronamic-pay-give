@@ -43,7 +43,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2016-03-23
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/give/compare/2.0.1...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/give/compare/2.0.2...HEAD
+[2.0.2]: https://github.com/wp-pay-extensions/give/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/wp-pay-extensions/give/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/wp-pay-extensions/give/compare/1.0.6...2.0.0
 [1.0.6]: https://github.com/wp-pay-extensions/give/compare/1.0.5...1.0.6
