@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.2] - 2019-08-26
+- Updated packages.
+
 ## [2.0.1] - 2018-12-12
 - Fix using default gateway setting.
 - Update item methods in payment data.

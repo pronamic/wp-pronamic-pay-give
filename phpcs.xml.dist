@@ -30,6 +30,5 @@
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
 
 		<exclude name="WordPress.PHP.DiscouragedFunctions.DiscouragedWithAlternative" />
-		<exclude name="WordPress.XSS.EscapeOutput" />
 	</rule>
 </ruleset>

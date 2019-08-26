@@ -108,8 +108,9 @@ class Gateway {
 
 		// Errors.
 		if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
-			printf( // WPCS: XSS ok.
+			printf(
 				'<div class="give_error">%s</div>',
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				Plugin::get_default_error_message()
 			);
 		}
@@ -122,7 +123,8 @@ class Gateway {
 		if ( $gateway ) {
 			$gateway->set_payment_method( $this->payment_method );
 
-			echo $gateway->get_input_html(); // WPCS: XSS ok.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo $gateway->get_input_html();
 		}
 	}
 
