@@ -118,13 +118,21 @@ class Gateway {
 		// Gateway.
 		$config_id = $this->get_config_id();
 
-		$gateway = Plugin::get_gateway( $config_id );
+		try {
+			$gateway = Plugin::get_gateway( $config_id );
 
-		if ( $gateway ) {
 			$gateway->set_payment_method( $this->payment_method );
 
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo $gateway->get_input_html();
+		} catch ( \Pronamic\WordPress\Pay\PayException $e ) {
+			printf(
+				'<div class="give_error">%s<br /><br />%s</div>',
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				Plugin::get_default_error_message(),
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				sprintf( '%s: %s', $e->get_error_code(), $e->get_message() )
+			);
 		}
 	}
 
@@ -187,48 +195,50 @@ class Gateway {
 					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
 				)
 			);
-		} else {
-			$config_id = $this->get_config_id();
 
-			$gateway = Plugin::get_gateway( $config_id );
+			return;
+		}
 
-			if ( $gateway ) {
-				// Data.
-				$data = new PaymentData( $donation_id, $this );
+		$config_id = $this->get_config_id();
 
-				$gateway->set_payment_method( $this->payment_method );
+		$gateway = Plugin::get_gateway( $config_id );
 
-				$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+		if ( null === $gateway ) {
+			return;
+		}
 
-				$error = $gateway->get_error();
+		// Data.
+		$data = new PaymentData( $donation_id, $this );
 
-				if ( is_wp_error( $error ) ) {
-					/*
-					 * Record the error.
-					 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
-					 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
-					 */
-					give_record_gateway_error(
-						__( 'Payment Error', 'pronamic_ideal' ),
-						implode( '<br />', $error->get_error_messages() ),
-						$donation_id
-					);
+		$gateway->set_payment_method( $this->payment_method );
 
-					/*
-					 * Problems? Send back.
-					 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
-					 */
-					give_send_back_to_checkout(
-						array(
-							'payment-error' => true,
-							'payment-mode'  => $purchase_data['post_data']['give-gateway'],
-						)
-					);
-				} else {
-					// Redirect.
-					$gateway->redirect( $payment );
-				}
-			}
+		try {
+			$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+
+			// Redirect.
+			$gateway->redirect( $payment );
+		} catch ( \Pronamic\WordPress\Pay\PayException $e ) {
+			/*
+			 * Record the error.
+			 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
+			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+			 */
+			give_record_gateway_error(
+				__( 'Payment Error', 'pronamic_ideal' ),
+				$e->get_message(),
+				$donation_id
+			);
+
+			/*
+			 * Problems? Send back.
+			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
+			 */
+			give_send_back_to_checkout(
+				array(
+					'payment-error' => true,
+					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
+				)
+			);
 		}
 	}
 
