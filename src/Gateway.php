@@ -125,13 +125,13 @@ class Gateway {
 
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo $gateway->get_input_html();
-		} catch ( \Pronamic\WordPress\Pay\PayException $e ) {
+		} catch ( \Exception $e ) {
 			printf(
 				'<div class="give_error">%s<br /><br />%s</div>',
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				Plugin::get_default_error_message(),
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				sprintf( '%s: %s', $e->get_error_code(), $e->get_message() )
+				sprintf( '%s: %s', $e->getCode(), $e->getMessage() )
 			);
 		}
 	}
@@ -217,7 +217,7 @@ class Gateway {
 
 			// Redirect.
 			$gateway->redirect( $payment );
-		} catch ( \Pronamic\WordPress\Pay\PayException $e ) {
+		} catch ( \Exception $e ) {
 			/*
 			 * Record the error.
 			 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
@@ -225,7 +225,7 @@ class Gateway {
 			 */
 			give_record_gateway_error(
 				__( 'Payment Error', 'pronamic_ideal' ),
-				$e->get_message(),
+				$e->getMessage(),
 				$donation_id
 			);
 
