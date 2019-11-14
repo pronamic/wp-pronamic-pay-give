@@ -35,7 +35,8 @@ class Gateway {
 		$this->payment_method = $payment_method;
 
 		// Add filters and actions.
-		add_filter( 'give_settings_gateways', array( $this, 'gateway_settings' ) );
+		add_filter( 'give_get_settings_gateways', array( $this, 'gateway_settings' ) );
+		add_filter( 'give_get_sections_gateways', array( $this, 'gateways_sections' ) );
 
 		add_action( 'give_gateway_' . $this->id, array( $this, 'process_purchase' ) );
 
@@ -49,6 +50,20 @@ class Gateway {
 	}
 
 	/**
+	 * Add gateways section.
+	 *
+	 * @param array $sections Gateways sections.
+	 *
+	 * @return  array
+	 * @since   2.0.3
+	 */
+	public function gateways_sections( $sections ) {
+		$sections[ $this->id ] = $this->name;
+
+		return $sections;
+	}
+
+	/**
 	 * Register gateway settings.
 	 *
 	 * @param   array $settings Gateway settings.
@@ -57,6 +72,13 @@ class Gateway {
 	 * @since   1.0.0
 	 */
 	public function gateway_settings( $settings ) {
+		$current_section = give_get_current_setting_section();
+
+		// Check if current section is the gateway ID.
+		if ( $this->id !== $current_section ) {
+			return $settings;
+		}
+
 		$description = '';
 
 		if ( 'pronamic_pay' === $this->id ) {
@@ -64,10 +86,9 @@ class Gateway {
 		}
 
 		$settings[] = array(
-			'name' => $this->name,
 			'desc' => $description,
 			'id'   => sprintf( 'give_title_%s', $this->id ),
-			'type' => 'give_title',
+			'type' => 'title',
 		);
 
 		$settings[] = array(
@@ -89,6 +110,11 @@ class Gateway {
 			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
 			'type'    => 'text',
 			'default' => __( 'Give donation {donation_id}', 'pronamic_ideal' ),
+		);
+
+		$settings[] = array(
+			'id'   => sprintf( 'give_title_gateway_settings_%s', $this->id ),
+			'type' => 'sectionend',
 		);
 
 		return $settings;
