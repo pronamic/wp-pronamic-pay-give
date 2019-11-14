@@ -1,4 +1,12 @@
 <?php
+/**
+ * Payment data
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\Give
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
@@ -19,6 +27,8 @@ use Pronamic\WordPress\Pay\Payments\Items;
 class PaymentData extends Core_PaymentData {
 	/**
 	 * The donation ID.
+	 *
+	 * @var int
 	 */
 	private $donation_id;
 
@@ -26,14 +36,16 @@ class PaymentData extends Core_PaymentData {
 	 * The gateway.
 	 *
 	 * @since 1.0.3
+	 *
+	 * @var Gateway
 	 */
 	private $gateway;
 
 	/**
 	 * Constructs and initializes an Give payment data object.
 	 *
-	 * @param $donation_id
-	 * @param $gateway
+	 * @param int     $donation_id Donation ID.
+	 * @param Gateway $gateway     Gateway.
 	 */
 	public function __construct( $donation_id, $gateway ) {
 		parent::__construct();
@@ -52,10 +64,20 @@ class PaymentData extends Core_PaymentData {
 		return 'give';
 	}
 
+	/**
+	 * Get source ID.
+	 *
+	 * @return int
+	 */
 	public function get_source_id() {
 		return $this->donation_id;
 	}
 
+	/**
+	 * Get title.
+	 *
+	 * @return string
+	 */
 	public function get_title() {
 		return sprintf(
 			/* translators: %s: order id */
@@ -105,11 +127,11 @@ class PaymentData extends Core_PaymentData {
 	 * @return Items
 	 */
 	public function get_items() {
-		// Items
+		// Items.
 		$items = new Items();
 
 		// Item
-		// We only add one total item, because iDEAL cant work with negative price items (discount)
+		// We only add one total item, because iDEAL cant work with negative price items (discount).
 		$item = new Item();
 		$item->set_number( $this->get_order_id() );
 		$item->set_description( $this->get_description() );

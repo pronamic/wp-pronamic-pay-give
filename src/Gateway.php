@@ -1,4 +1,12 @@
 <?php
+/**
+ * Gateway
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\Give
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
@@ -21,6 +29,20 @@ class Gateway {
 	 * @var string
 	 */
 	protected $payment_method;
+
+	/**
+	 * Unique identifier.
+	 *
+	 * @var string
+	 */
+	protected $id;
+
+	/**
+	 * Name.
+	 *
+	 * @var string
+	 */
+	protected $name;
 
 	/**
 	 * Constructs and initialize a gateway.
@@ -275,7 +297,7 @@ class Gateway {
 	 * @return string
 	 */
 	public function get_transaction_description() {
-		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ) );
+		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ), '' );
 	}
 
 	/**
