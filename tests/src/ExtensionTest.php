@@ -19,7 +19,7 @@ use PHPUnit_Framework_TestCase;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.0.3
  * @since   1.0.0
  */
 class ExtensionTest extends PHPUnit_Framework_TestCase {
