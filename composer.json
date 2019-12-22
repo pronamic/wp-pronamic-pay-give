@@ -31,12 +31,36 @@
 	"config": {
 		"sort-packages": true
 	},
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "impress-org/givewp",
+				"version": "2.5.10",
+				"dist": {
+					"url": "https://github.com/impress-org/givewp/archive/2.5.10.zip",
+					"type": "zip"
+				},
+				"source": {
+					"url": "https://github.com/impress-org/givewp",
+					"type": "github",
+					"reference": "tags/2.5.10"
+				},
+				"autoload": {
+					"classmap": [
+						"."
+					]
+				}
+			}
+		}
+	],
 	"require": {
 		"php": ">=5.6.20",
-		"wp-pay/core": "^2.1"
+		"wp-pay/core": "^2.2"
 	},
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.5",
+		"impress-org/givewp": "^2.5",
 		"php-coveralls/php-coveralls": "^2.1",
 		"phpcompatibility/php-compatibility": "^9.1",
 		"phpcompatibility/phpcompatibility-wp": "^2.0",

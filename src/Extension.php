@@ -1,9 +1,17 @@
 <?php
+/**
+ * Extension
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\Give
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\Statuses;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
@@ -13,7 +21,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.0.3
  * @since   1.0.0
  */
 class Extension {
@@ -23,6 +31,13 @@ class Extension {
 	 * @var string
 	 */
 	const SLUG = 'give';
+
+	/**
+	 * Gateways.
+	 *
+	 * @var array|null
+	 */
+	private $gateways;
 
 	/**
 	 * Bootstrap
@@ -51,12 +66,14 @@ class Extension {
 	 *
 	 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L37
 	 *
-	 * @param array $gateways
+	 * @param array $gateways Gateways.
 	 *
 	 * @return array
 	 */
 	public function give_payment_gateways( $gateways ) {
-		if ( ! isset( $this->gateways ) ) {
+		if ( null === $this->gateways ) {
+			$this->gateways = array();
+
 			$classes = array(
 				'Gateway',
 				'BancontactGateway',
@@ -89,22 +106,19 @@ class Extension {
 	/**
 	 * Payment redirect URL filter.
 	 *
-	 * @param string  $url
-	 * @param Payment $payment
+	 * @param string  $url     Redirect URL.
+	 * @param Payment $payment Payment.
 	 *
 	 * @return string
 	 */
 	public static function redirect_url( $url, $payment ) {
 		switch ( $payment->get_status() ) {
-			case Statuses::CANCELLED:
+			case PaymentStatus::CANCELLED:
+			case PaymentStatus::FAILURE:
 				$url = give_get_failed_transaction_uri();
 
 				break;
-			case Statuses::FAILURE:
-				$url = give_get_failed_transaction_uri();
-
-				break;
-			case Statuses::SUCCESS:
+			case PaymentStatus::SUCCESS:
 				$url = give_get_success_page_uri();
 
 				break;
@@ -118,29 +132,29 @@ class Extension {
 	 *
 	 * @link https://github.com/Charitable/Charitable/blob/1.1.4/includes/gateways/class-charitable-gateway-paypal.php#L229-L357
 	 *
-	 * @param Payment $payment
+	 * @param Payment $payment Payment.
 	 */
 	public static function status_update( Payment $payment ) {
-		$donation_id = $payment->get_source_id();
+		$donation_id = (int) $payment->get_source_id();
 
 		switch ( $payment->get_status() ) {
-			case Statuses::CANCELLED:
+			case PaymentStatus::CANCELLED:
 				give_update_payment_status( $donation_id, 'cancelled' );
 
 				break;
-			case Statuses::EXPIRED:
+			case PaymentStatus::EXPIRED:
 				give_update_payment_status( $donation_id, 'abandoned' );
 
 				break;
-			case Statuses::FAILURE:
+			case PaymentStatus::FAILURE:
 				give_update_payment_status( $donation_id, 'failed' );
 
 				break;
-			case Statuses::SUCCESS:
+			case PaymentStatus::SUCCESS:
 				give_update_payment_status( $donation_id, 'publish' );
 
 				break;
-			case Statuses::OPEN:
+			case PaymentStatus::OPEN:
 			default:
 				give_update_payment_status( $donation_id, 'pending' );
 
@@ -175,19 +189,21 @@ class Extension {
 	/**
 	 * Source column
 	 *
-	 * @param         $text
-	 * @param Payment $payment
+	 * @param string  $text    Source text.
+	 * @param Payment $payment Payment.
 	 *
 	 * @return string
 	 */
 	public static function source_text( $text, Payment $payment ) {
+		$source_id = (int) $payment->source_id;
+
 		$text = __( 'Give', 'pronamic_ideal' ) . '<br />';
 
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
-			get_edit_post_link( $payment->source_id ),
+			get_edit_post_link( $source_id ),
 			/* translators: %s: source id */
-			sprintf( __( 'Donation %s', 'pronamic_ideal' ), $payment->source_id )
+			sprintf( __( 'Donation %s', 'pronamic_ideal' ), $source_id )
 		);
 
 		return $text;
@@ -196,8 +212,8 @@ class Extension {
 	/**
 	 * Source description.
 	 *
-	 * @param         $description
-	 * @param Payment $payment
+	 * @param string  $description Source description.
+	 * @param Payment $payment     Payment.
 	 *
 	 * @return string
 	 */
@@ -208,8 +224,8 @@ class Extension {
 	/**
 	 * Source URL.
 	 *
-	 * @param         $url
-	 * @param Payment $payment
+	 * @param string  $url     Source URL.
+	 * @param Payment $payment payment.
 	 *
 	 * @return string
 	 */

@@ -1,4 +1,12 @@
 <?php
+/**
+ * Gateway
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\Give
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
@@ -11,7 +19,7 @@ use Pronamic\WordPress\Pay\Plugin;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.1
+ * @version 2.0.3
  * @since   1.0.0
  */
 class Gateway {
@@ -21,6 +29,20 @@ class Gateway {
 	 * @var string
 	 */
 	protected $payment_method;
+
+	/**
+	 * Unique identifier.
+	 *
+	 * @var string
+	 */
+	protected $id;
+
+	/**
+	 * Name.
+	 *
+	 * @var string
+	 */
+	protected $name;
 
 	/**
 	 * Constructs and initialize a gateway.
@@ -35,7 +57,8 @@ class Gateway {
 		$this->payment_method = $payment_method;
 
 		// Add filters and actions.
-		add_filter( 'give_settings_gateways', array( $this, 'gateway_settings' ) );
+		add_filter( 'give_get_settings_gateways', array( $this, 'gateway_settings' ) );
+		add_filter( 'give_get_sections_gateways', array( $this, 'gateways_sections' ) );
 
 		add_action( 'give_gateway_' . $this->id, array( $this, 'process_purchase' ) );
 
@@ -49,6 +72,20 @@ class Gateway {
 	}
 
 	/**
+	 * Add gateways section.
+	 *
+	 * @param array $sections Gateways sections.
+	 *
+	 * @return  array
+	 * @since   2.0.3
+	 */
+	public function gateways_sections( $sections ) {
+		$sections[ $this->id ] = $this->name;
+
+		return $sections;
+	}
+
+	/**
 	 * Register gateway settings.
 	 *
 	 * @param   array $settings Gateway settings.
@@ -57,6 +94,13 @@ class Gateway {
 	 * @since   1.0.0
 	 */
 	public function gateway_settings( $settings ) {
+		$current_section = give_get_current_setting_section();
+
+		// Check if current section is the gateway ID.
+		if ( $this->id !== $current_section ) {
+			return $settings;
+		}
+
 		$description = '';
 
 		if ( 'pronamic_pay' === $this->id ) {
@@ -64,10 +108,9 @@ class Gateway {
 		}
 
 		$settings[] = array(
-			'name' => $this->name,
 			'desc' => $description,
 			'id'   => sprintf( 'give_title_%s', $this->id ),
-			'type' => 'give_title',
+			'type' => 'title',
 		);
 
 		$settings[] = array(
@@ -89,6 +132,11 @@ class Gateway {
 			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
 			'type'    => 'text',
 			'default' => __( 'Give donation {donation_id}', 'pronamic_ideal' ),
+		);
+
+		$settings[] = array(
+			'id'   => sprintf( 'give_title_gateway_settings_%s', $this->id ),
+			'type' => 'sectionend',
 		);
 
 		return $settings;
@@ -118,13 +166,21 @@ class Gateway {
 		// Gateway.
 		$config_id = $this->get_config_id();
 
-		$gateway = Plugin::get_gateway( $config_id );
+		try {
+			$gateway = Plugin::get_gateway( $config_id );
 
-		if ( $gateway ) {
 			$gateway->set_payment_method( $this->payment_method );
 
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo $gateway->get_input_html();
+		} catch ( \Exception $e ) {
+			printf(
+				'<div class="give_error">%s<br /><br />%s</div>',
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				Plugin::get_default_error_message(),
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				sprintf( '%s: %s', $e->getCode(), $e->getMessage() )
+			);
 		}
 	}
 
@@ -172,7 +228,7 @@ class Gateway {
 				sprintf(
 					/* translators: %s: payment data as JSON */
 					__( 'Payment creation failed before sending buyer to payment provider. Payment data: %s', 'pronamic_ideal' ),
-					wp_json_encode( $payment_data )
+					(string) wp_json_encode( $payment_data )
 				),
 				$donation_id
 			);
@@ -187,48 +243,50 @@ class Gateway {
 					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
 				)
 			);
-		} else {
-			$config_id = $this->get_config_id();
 
-			$gateway = Plugin::get_gateway( $config_id );
+			return;
+		}
 
-			if ( $gateway ) {
-				// Data.
-				$data = new PaymentData( $donation_id, $this );
+		$config_id = $this->get_config_id();
 
-				$gateway->set_payment_method( $this->payment_method );
+		$gateway = Plugin::get_gateway( $config_id );
 
-				$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+		if ( null === $gateway ) {
+			return;
+		}
 
-				$error = $gateway->get_error();
+		// Data.
+		$data = new PaymentData( $donation_id, $this );
 
-				if ( is_wp_error( $error ) ) {
-					/*
-					 * Record the error.
-					 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
-					 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
-					 */
-					give_record_gateway_error(
-						__( 'Payment Error', 'pronamic_ideal' ),
-						implode( '<br />', $error->get_error_messages() ),
-						$donation_id
-					);
+		$gateway->set_payment_method( $this->payment_method );
 
-					/*
-					 * Problems? Send back.
-					 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
-					 */
-					give_send_back_to_checkout(
-						array(
-							'payment-error' => true,
-							'payment-mode'  => $purchase_data['post_data']['give-gateway'],
-						)
-					);
-				} else {
-					// Redirect.
-					$gateway->redirect( $payment );
-				}
-			}
+		try {
+			$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+
+			// Redirect.
+			$gateway->redirect( $payment );
+		} catch ( \Exception $e ) {
+			/*
+			 * Record the error.
+			 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
+			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
+			 */
+			give_record_gateway_error(
+				__( 'Payment Error', 'pronamic_ideal' ),
+				$e->getMessage(),
+				$donation_id
+			);
+
+			/*
+			 * Problems? Send back.
+			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
+			 */
+			give_send_back_to_checkout(
+				array(
+					'payment-error' => true,
+					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
+				)
+			);
 		}
 	}
 
@@ -239,7 +297,7 @@ class Gateway {
 	 * @return string
 	 */
 	public function get_transaction_description() {
-		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ) );
+		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ), '' );
 	}
 
 	/**
