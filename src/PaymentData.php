@@ -3,7 +3,7 @@
  * Payment data
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2019 Pronamic
+ * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
@@ -17,7 +17,7 @@ use Pronamic\WordPress\Pay\Payments\Items;
 /**
  * Title: WordPress pay Give payment data
  * Description:
- * Copyright: 2005-2019 Pronamic
+ * Copyright: 2005-2020 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
