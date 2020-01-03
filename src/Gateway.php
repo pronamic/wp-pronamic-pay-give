@@ -35,14 +35,14 @@ class Gateway {
 	 *
 	 * @var string
 	 */
-	protected $id;
+	public $id;
 
 	/**
 	 * Name.
 	 *
 	 * @var string
 	 */
-	protected $name;
+	public $name;
 
 	/**
 	 * Constructs and initialize a gateway.
