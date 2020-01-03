@@ -21,7 +21,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.3
+ * @version 2.0.4
  * @since   1.0.0
  */
 class Extension {
