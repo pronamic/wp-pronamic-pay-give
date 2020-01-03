@@ -217,7 +217,7 @@ class Gateway {
 		// Record the pending payment.
 		$donation_id = give_insert_payment( $payment_data );
 
-		if ( ! $donation_id ) {
+		if ( false === $donation_id ) {
 			/*
 			 * Record the error.
 			 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
