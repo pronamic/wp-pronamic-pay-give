@@ -3,7 +3,7 @@
  * Gateway
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2019 Pronamic
+ * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
@@ -15,11 +15,11 @@ use Pronamic\WordPress\Pay\Plugin;
 /**
  * Title: Give gateway
  * Description:
- * Copyright: 2005-2019 Pronamic
+ * Copyright: 2005-2020 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.3
+ * @version 2.0.4
  * @since   1.0.0
  */
 class Gateway {
@@ -35,14 +35,14 @@ class Gateway {
 	 *
 	 * @var string
 	 */
-	protected $id;
+	public $id;
 
 	/**
 	 * Name.
 	 *
 	 * @var string
 	 */
-	protected $name;
+	public $name;
 
 	/**
 	 * Constructs and initialize a gateway.
@@ -217,7 +217,7 @@ class Gateway {
 		// Record the pending payment.
 		$donation_id = give_insert_payment( $payment_data );
 
-		if ( ! $donation_id ) {
+		if ( false === $donation_id ) {
 			/*
 			 * Record the error.
 			 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
@@ -229,8 +229,7 @@ class Gateway {
 					/* translators: %s: payment data as JSON */
 					__( 'Payment creation failed before sending buyer to payment provider. Payment data: %s', 'pronamic_ideal' ),
 					(string) wp_json_encode( $payment_data )
-				),
-				$donation_id
+				)
 			);
 
 			/*

@@ -3,13 +3,14 @@
  * Payment data
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2019 Pronamic
+ * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Payments\PaymentData as Core_PaymentData;
 use Pronamic\WordPress\Pay\Payments\Item;
 use Pronamic\WordPress\Pay\Payments\Items;
@@ -17,7 +18,7 @@ use Pronamic\WordPress\Pay\Payments\Items;
 /**
  * Title: WordPress pay Give payment data
  * Description:
- * Copyright: 2005-2019 Pronamic
+ * Copyright: 2005-2020 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
@@ -132,11 +133,12 @@ class PaymentData extends Core_PaymentData {
 
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount).
+		$price = new Money( \give_donation_amount( $this->donation_id ) );
+
 		$item = new Item();
 		$item->set_number( $this->get_order_id() );
 		$item->set_description( $this->get_description() );
-		// @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
-		$item->set_price( give_get_payment_amount( $this->donation_id ) );
+		$item->set_price( $price->get_value() );
 		$item->set_quantity( 1 );
 
 		$items->add_item( $item );

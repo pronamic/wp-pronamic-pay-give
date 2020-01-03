@@ -3,7 +3,7 @@
  * Extension
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2019 Pronamic
+ * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
@@ -17,11 +17,11 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 /**
  * Title: Give extension
  * Description:
- * Copyright: 2005-2019 Pronamic
+ * Copyright: 2005-2020 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.3
+ * @version 2.0.4
  * @since   1.0.0
  */
 class Extension {
@@ -230,6 +230,6 @@ class Extension {
 	 * @return string
 	 */
 	public function source_url( $url, Payment $payment ) {
-		return get_edit_post_link( $payment->source_id );
+		return get_edit_post_link( (int) $payment->source_id );
 	}
 }
