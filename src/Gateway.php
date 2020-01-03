@@ -229,8 +229,7 @@ class Gateway {
 					/* translators: %s: payment data as JSON */
 					__( 'Payment creation failed before sending buyer to payment provider. Payment data: %s', 'pronamic_ideal' ),
 					(string) wp_json_encode( $payment_data )
-				),
-				$donation_id
+				)
 			);
 
 			/*
