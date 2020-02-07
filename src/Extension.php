@@ -24,7 +24,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * @version 2.0.4
  * @since   1.0.0
  */
-class Extension {
+class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	/**
 	 * Slug
 	 *
@@ -50,6 +50,8 @@ class Extension {
 	 * Construct and initializes an Charitable extension object.
 	 */
 	public function __construct() {
+		parent::__construct();
+
 		add_filter( 'give_payment_gateways', array( $this, 'give_payment_gateways' ) );
 
 		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
