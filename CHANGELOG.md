@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.0] - 2020-03-19
+- Extension extends abstract plugin integration.
+
 ## [2.0.4] - 2020-01-03
 - Fix inaccessible property error.
 
@@ -51,7 +54,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2016-03-23
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/give/compare/2.0.4...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/give/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/wp-pay-extensions/give/compare/2.0.4...2.1.0
 [2.0.4]: https://github.com/wp-pay-extensions/give/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/wp-pay-extensions/give/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/wp-pay-extensions/give/compare/2.0.1...2.0.2
