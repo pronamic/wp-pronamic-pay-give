@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -21,10 +22,10 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.4
+ * @version 2.1.1
  * @since   1.0.0
  */
-class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
+class Extension extends AbstractPluginIntegration {
 	/**
 	 * Slug
 	 *
@@ -40,27 +41,39 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	private $gateways;
 
 	/**
-	 * Bootstrap
-	 */
-	public static function bootstrap() {
-		new self();
-	}
-
-	/**
-	 * Construct and initializes an Charitable extension object.
+	 * Construct Give plugin integration.
+	 *
+	 * @return void
 	 */
 	public function __construct() {
 		parent::__construct();
 
-		add_filter( 'give_payment_gateways', array( $this, 'give_payment_gateways' ) );
+		// Dependencies.
+		$dependencies = $this->get_dependencies();
 
-		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
-		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
-		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( $this, 'source_description' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( $this, 'source_url' ), 10, 2 );
+		$dependencies->add( new GiveDependency() );
+	}
 
-		add_filter( 'give_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
+	/**
+	 * Setup.
+	 *
+	 * @return void
+	 */
+	public function setup() {
+		\add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( $this, 'source_description' ), 10, 2 );
+		\add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( $this, 'source_text' ), 10, 2 );
+		\add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( $this, 'source_url' ), 10, 2 );
+
+		// Check if dependencies are met and integration is active.
+		if ( ! $this->is_active() ) {
+			return;
+		}
+
+		\add_action( 'pronamic_payment_status_update_' . self::SLUG, array( $this, 'status_update' ), 10, 1 );
+		\add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( $this, 'redirect_url' ), 10, 2 );
+
+		\add_filter( 'give_payment_gateways', array( $this, 'give_payment_gateways' ) );
+		\add_filter( 'give_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
 	}
 
 	/**
@@ -113,7 +126,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 *
 	 * @return string
 	 */
-	public static function redirect_url( $url, $payment ) {
+	public function redirect_url( $url, $payment ) {
 		switch ( $payment->get_status() ) {
 			case PaymentStatus::CANCELLED:
 			case PaymentStatus::FAILURE:
@@ -136,7 +149,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 *
 	 * @param Payment $payment Payment.
 	 */
-	public static function status_update( Payment $payment ) {
+	public function status_update( Payment $payment ) {
 		$donation_id = (int) $payment->get_source_id();
 
 		switch ( $payment->get_status() ) {
@@ -196,7 +209,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 *
 	 * @return string
 	 */
-	public static function source_text( $text, Payment $payment ) {
+	public function source_text( $text, Payment $payment ) {
 		$source_id = (int) $payment->source_id;
 
 		$text = __( 'Give', 'pronamic_ideal' ) . '<br />';
