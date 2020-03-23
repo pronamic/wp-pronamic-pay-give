@@ -46,7 +46,11 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function __construct() {
-		parent::__construct();
+		parent::__construct(
+			array(
+				'name' => __( 'Give', 'pronamic_ideal' ),
+			)
+		);
 
 		// Dependencies.
 		$dependencies = $this->get_dependencies();
