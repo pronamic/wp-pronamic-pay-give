@@ -125,7 +125,7 @@ class Gateway {
 		$settings[] = array(
 			'name'    => __( 'Transaction description', 'pronamic_ideal' ),
 			'desc'    => sprintf(
-				/* translators: %s: <code>{donation_id}</code> */
+				/* translators: %s: <code>{tag}</code> */
 				__( 'Available tags: %s', 'pronamic_ideal' ),
 				sprintf( '<code>%s</code>', '{donation_id}' )
 			),
