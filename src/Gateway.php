@@ -10,7 +10,10 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Pronamic\WordPress\Money\Currency;
+use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
  * Title: Give gateway
@@ -254,13 +257,44 @@ class Gateway {
 			return;
 		}
 
-		// Data.
-		$data = new PaymentData( $donation_id, $this );
-
 		$gateway->set_payment_method( $this->payment_method );
 
+		$user_info = \give_get_payment_meta_user_info( $donation_id );
+
+		/**
+		 * Build payment.
+		 */
+		$payment = new Payment();
+
+		$payment->source    = 'give';
+		$payment->source_id = $donation_id;
+		$payment->order_id  = $donation_id;
+
+		$payment->description = GiveHelper::get_description( $this, $donation_id );
+
+		$payment->title = GiveHelper::get_title( $donation_id );
+
+		// Customer.
+		$payment->set_customer( GiveHelper::get_customer_from_user_info( $user_info, $donation_id ) );
+
+		// Address.
+		$payment->set_billing_address( GiveHelper::get_address_from_user_info( $user_info, $donation_id ) );
+
+		// Currency.
+		$currency = Currency::get_instance( \give_get_payment_currency_code( $donation_id ) );
+
+		// Amount.
+		$payment->set_total_amount( new TaxedMoney( \give_donation_amount( $donation_id ), $currency ) );
+
+		// Method.
+		$payment->method = $this->payment_method;
+
+		// Configuration.
+		$payment->config_id = $config_id;
+
+		// Start.
 		try {
-			$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+			$payment = Plugin::start_payment( $payment );
 
 			// Redirect.
 			$gateway->redirect( $payment );
