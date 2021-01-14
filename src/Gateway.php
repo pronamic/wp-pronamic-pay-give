@@ -330,7 +330,7 @@ class Gateway {
 			$payment = Plugin::start_payment( $payment );
 
 			// Redirect.
-			$gateway->redirect( $payment );
+			\wp_safe_redirect( $payment->get_pay_redirect_url(), 303 );
 		} catch ( \Exception $e ) {
 			/*
 			 * Record the error.
