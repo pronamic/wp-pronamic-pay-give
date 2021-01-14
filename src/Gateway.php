@@ -10,7 +10,11 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Give\Helpers\Form\Utils as FormUtils;
+use Pronamic\WordPress\Money\Currency;
+use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
  * Title: Give gateway
@@ -63,12 +67,12 @@ class Gateway {
 		add_action( 'give_gateway_' . $this->id, array( $this, 'process_purchase' ) );
 
 		if ( defined( 'GIVE_VERSION' ) && version_compare( GIVE_VERSION, '1.7', '>=' ) ) {
-			add_action( 'give_donation_form_before_submit', array( $this, 'info_fields' ) );
+			add_action( 'give_donation_form_before_submit', array( $this, 'before_submit_input_fields' ) );
 		} else {
-			add_action( 'give_purchase_form_before_submit', array( $this, 'info_fields' ) );
+			add_action( 'give_purchase_form_before_submit', array( $this, 'before_submit_input_fields' ) );
 		}
 
-		add_action( 'give_' . $this->id . '_cc_form', '__return_false' );
+		add_action( 'give_' . $this->id . '_cc_form', array( $this, 'payment_fields' ) );
 	}
 
 	/**
@@ -125,7 +129,7 @@ class Gateway {
 		$settings[] = array(
 			'name'    => __( 'Transaction description', 'pronamic_ideal' ),
 			'desc'    => sprintf(
-				/* translators: %s: <code>{donation_id}</code> */
+				/* translators: %s: <code>{tag}</code> */
 				__( 'Available tags: %s', 'pronamic_ideal' ),
 				sprintf( '<code>%s</code>', '{donation_id}' )
 			),
@@ -147,7 +151,7 @@ class Gateway {
 	 *
 	 * @param int $form_id Form ID.
 	 */
-	public function info_fields( $form_id ) {
+	public function input_fields( $form_id ) {
 		$payment_mode = give_get_chosen_gateway( $form_id );
 
 		if ( $this->id !== $payment_mode ) {
@@ -182,6 +186,38 @@ class Gateway {
 				sprintf( '%s: %s', $e->getCode(), $e->getMessage() )
 			);
 		}
+	}
+
+	/**
+	 * Legacy input fields.
+	 *
+	 * @param int $form_id Form ID.
+	 * @return void
+	 */
+	public function before_submit_input_fields( $form_id ) {
+		if ( \class_exists( 'Give\Helpers\Form\Utils' ) && ! FormUtils::isLegacyForm( $form_id ) ) {
+			return;
+		}
+
+		$this->input_fields( $form_id );
+	}
+
+	/**
+	 * Input fields.
+	 *
+	 * @param int $form_id Form ID.
+	 * @return void
+	 */
+	public function payment_fields( $form_id ) {
+		if ( ! \class_exists( 'Give\Helpers\Form\Utils' ) ) {
+			return;
+		}
+
+		if ( FormUtils::isLegacyForm( $form_id ) ) {
+			return;
+		}
+
+		$this->input_fields( $form_id );
 	}
 
 	/**
@@ -254,16 +290,47 @@ class Gateway {
 			return;
 		}
 
-		// Data.
-		$data = new PaymentData( $donation_id, $this );
-
 		$gateway->set_payment_method( $this->payment_method );
 
+		$user_info = \give_get_payment_meta_user_info( $donation_id );
+
+		/**
+		 * Build payment.
+		 */
+		$payment = new Payment();
+
+		$payment->source    = 'give';
+		$payment->source_id = $donation_id;
+		$payment->order_id  = $donation_id;
+
+		$payment->description = GiveHelper::get_description( $this, $donation_id );
+
+		$payment->title = GiveHelper::get_title( $donation_id );
+
+		// Customer.
+		$payment->set_customer( GiveHelper::get_customer_from_user_info( $user_info, $donation_id ) );
+
+		// Address.
+		$payment->set_billing_address( GiveHelper::get_address_from_user_info( $user_info, $donation_id ) );
+
+		// Currency.
+		$currency = Currency::get_instance( \give_get_payment_currency_code( $donation_id ) );
+
+		// Amount.
+		$payment->set_total_amount( new TaxedMoney( \give_donation_amount( $donation_id ), $currency ) );
+
+		// Method.
+		$payment->method = $this->payment_method;
+
+		// Configuration.
+		$payment->config_id = $config_id;
+
+		// Start.
 		try {
-			$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+			$payment = Plugin::start_payment( $payment );
 
 			// Redirect.
-			$gateway->redirect( $payment );
+			\wp_safe_redirect( $payment->get_pay_redirect_url(), 303 );
 		} catch ( \Exception $e ) {
 			/*
 			 * Record the error.
