@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Give\Helpers\Form\Utils as FormUtils;
 use Pronamic\WordPress\Money\Currency;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Plugin;
@@ -66,12 +67,12 @@ class Gateway {
 		add_action( 'give_gateway_' . $this->id, array( $this, 'process_purchase' ) );
 
 		if ( defined( 'GIVE_VERSION' ) && version_compare( GIVE_VERSION, '1.7', '>=' ) ) {
-			add_action( 'give_donation_form_before_submit', array( $this, 'info_fields' ) );
+			add_action( 'give_donation_form_before_submit', array( $this, 'before_submit_input_fields' ) );
 		} else {
-			add_action( 'give_purchase_form_before_submit', array( $this, 'info_fields' ) );
+			add_action( 'give_purchase_form_before_submit', array( $this, 'before_submit_input_fields' ) );
 		}
 
-		add_action( 'give_' . $this->id . '_cc_form', '__return_false' );
+		add_action( 'give_' . $this->id . '_cc_form', array( $this, 'payment_fields' ) );
 	}
 
 	/**
@@ -150,7 +151,7 @@ class Gateway {
 	 *
 	 * @param int $form_id Form ID.
 	 */
-	public function info_fields( $form_id ) {
+	public function input_fields( $form_id ) {
 		$payment_mode = give_get_chosen_gateway( $form_id );
 
 		if ( $this->id !== $payment_mode ) {
@@ -185,6 +186,38 @@ class Gateway {
 				sprintf( '%s: %s', $e->getCode(), $e->getMessage() )
 			);
 		}
+	}
+
+	/**
+	 * Legacy input fields.
+	 *
+	 * @param int $form_id Form ID.
+	 * @return void
+	 */
+	public function before_submit_input_fields( $form_id ) {
+		if ( \class_exists( 'Give\Helpers\Form\Utils' ) && ! FormUtils::isLegacyForm( $form_id ) ) {
+			return;
+		}
+
+		$this->input_fields( $form_id );
+	}
+
+	/**
+	 * Input fields.
+	 *
+	 * @param int $form_id Form ID.
+	 * @return void
+	 */
+	public function payment_fields( $form_id ) {
+		if ( ! \class_exists( 'Give\Helpers\Form\Utils' ) ) {
+			return;
+		}
+
+		if ( FormUtils::isLegacyForm( $form_id ) ) {
+			return;
+		}
+
+		$this->input_fields( $form_id );
 	}
 
 	/**
