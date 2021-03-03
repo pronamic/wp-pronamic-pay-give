@@ -42,7 +42,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 - Added filter for payment source description and URL.
 
 ## [1.0.4] - 2016-11-16
-- Display payment input fields also if guest donations are not allowed and registraton and/or login forms are displayed.
+- Display payment input fields also if guest donations are not allowed and registration and/or login forms are displayed.
 
 ## [1.0.3] - 2016-10-20
 - Use 'donation' instead of 'transaction' in transaction description.
