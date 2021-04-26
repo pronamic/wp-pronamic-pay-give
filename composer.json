@@ -31,27 +31,13 @@
 	"config": {
 		"sort-packages": true
 	},
-	"repositories": [
+	"repositories":[
 		{
-			"type": "package",
-			"package": {
-				"name": "impress-org/givewp",
-				"version": "2.5.10",
-				"dist": {
-					"url": "https://github.com/impress-org/givewp/archive/2.5.10.zip",
-					"type": "zip"
-				},
-				"source": {
-					"url": "https://github.com/impress-org/givewp",
-					"type": "github",
-					"reference": "tags/2.5.10"
-				},
-				"autoload": {
-					"classmap": [
-						"."
-					]
-				}
-			}
+			"type": "composer",
+			"url": "https://wpackagist.org",
+			"only": [
+				"wpackagist-plugin/*"
+			]
 		}
 	],
 	"require": {
@@ -59,24 +45,29 @@
 		"wp-pay/core": "^2.6"
 	},
 	"require-dev": {
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
-		"impress-org/givewp": "^2.5",
-		"php-coveralls/php-coveralls": "^2.1",
+		"bamarni/composer-bin-plugin": "^1.4",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+		"php-coveralls/php-coveralls": "^2.4",
 		"phpcompatibility/php-compatibility": "^9.1",
 		"phpcompatibility/phpcompatibility-wp": "^2.0",
 		"phpmd/phpmd": "^2.7",
 		"phpunit/phpunit": "^5.7 || ^6.0",
 		"roots/wordpress": "^5.6",
 		"squizlabs/php_codesniffer": "^3.4",
-		"wp-coding-standards/wpcs": "^2.1",
-		"wp-phpunit/wp-phpunit": "^5.6"
+		"wp-coding-standards/wpcs": "^2.3",
+		"wp-phpunit/wp-phpunit": "^5.6",
+		"wpackagist-plugin/give": "^2.9"
 	},
 	"scripts": {
-		"coveralls": "vendor/bin/coveralls -v",
+		"coveralls": "vendor/bin/php-coveralls -v",
 		"phpcbf": "vendor/bin/phpcbf",
 		"phpcs": "vendor/bin/phpcs -s -v",
 		"phplint": "find src tests -name '*.php' | xargs -n 1 -P 4 php -l",
 		"phpmd": "vendor/bin/phpmd src,tests text phpmd.ruleset.xml --suffixes php",
-		"phpunit": "vendor/bin/phpunit"
+		"phpstan": "vendor/bin/phpstan analyse",
+		"phpunit": "vendor/bin/phpunit",
+		"post-install-cmd": "echo 'Optionally run: composer bin all install'",
+		"post-update-cmd": "echo 'Optionally run: composer bin all update'",
+		"psalm": "vendor/bin/psalm"
 	}
 }

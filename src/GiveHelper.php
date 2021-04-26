@@ -3,7 +3,7 @@
  * Give Helper
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2020 Pronamic
+ * @copyright 2005-2021 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
@@ -80,12 +80,14 @@ class GiveHelper {
 	 * Get customer from user data.
 	 */
 	public static function get_customer_from_user_info( $user_info, $donation_id ) {
-		return CustomerHelper::from_array( array(
-			'name'    => self::get_name_from_user_info( $user_info ),
-			'email'   => \give_get_payment_user_email( $donation_id ),
-			'phone'   => null,
-			'user_id' => null,
-		) );
+		return CustomerHelper::from_array(
+			array(
+				'name'    => self::get_name_from_user_info( $user_info ),
+				'email'   => \give_get_payment_user_email( $donation_id ),
+				'phone'   => null,
+				'user_id' => null,
+			)
+		);
 	}
 
 	/**
@@ -94,10 +96,12 @@ class GiveHelper {
 	 * @return ContactName|null
 	 */
 	public static function get_name_from_user_info( $user_info ) {
-		return ContactNameHelper::from_array( array(
-			'first_name' => self::get_value_from_array( $user_info, 'first_name' ),
-			'last_name'  => self::get_value_from_array( $user_info, 'last_name' ),
-		) );
+		return ContactNameHelper::from_array(
+			array(
+				'first_name' => self::get_value_from_array( $user_info, 'first_name' ),
+				'last_name'  => self::get_value_from_array( $user_info, 'last_name' ),
+			)
+		);
 	}
 
 	/**
@@ -108,16 +112,18 @@ class GiveHelper {
 	public static function get_address_from_user_info( $user_info, $donation_id ) {
 		$address_info = self::get_value_from_array( $user_info, 'address' );
 
-		return AddressHelper::from_array( array(
-			'name'         => self::get_name_from_user_info( $user_info ),
-			'line_1'       => self::get_value_from_array( $address_info, 'line1' ),
-			'line_2'       => self::get_value_from_array( $address_info, 'line2' ),
-			'postal_code'  => self::get_value_from_array( $address_info, 'zip' ),
-			'city'         => self::get_value_from_array( $address_info, 'city' ),
-			'region'       => null,
-			'country_code' => null,
-			'email'        => \give_get_payment_user_email( $donation_id ),
-			'phone'        => null,
-		) );
+		return AddressHelper::from_array(
+			array(
+				'name'         => self::get_name_from_user_info( $user_info ),
+				'line_1'       => self::get_value_from_array( $address_info, 'line1' ),
+				'line_2'       => self::get_value_from_array( $address_info, 'line2' ),
+				'postal_code'  => self::get_value_from_array( $address_info, 'zip' ),
+				'city'         => self::get_value_from_array( $address_info, 'city' ),
+				'region'       => null,
+				'country_code' => null,
+				'email'        => \give_get_payment_user_email( $donation_id ),
+				'phone'        => null,
+			)
+		);
 	}
 }
