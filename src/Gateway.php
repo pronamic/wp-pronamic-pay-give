@@ -13,6 +13,7 @@ namespace Pronamic\WordPress\Pay\Extensions\Give;
 use Give\Helpers\Form\Utils as FormUtils;
 use Pronamic\WordPress\Money\Currency;
 use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
@@ -42,22 +43,14 @@ class Gateway {
 	public $id;
 
 	/**
-	 * Name.
-	 *
-	 * @var string
-	 */
-	public $name;
-
-	/**
 	 * Constructs and initialize a gateway.
 	 *
 	 * @param string $id             Gateway ID.
 	 * @param string $name           Gateway name.
 	 * @param string $payment_method Gateway payment method.
 	 */
-	public function __construct( $id = 'pronamic_pay', $name = 'Pronamic', $payment_method = null ) {
+	public function __construct( $id = 'pronamic_pay', $payment_method = null ) {
 		$this->id             = $id;
-		$this->name           = $name;
 		$this->payment_method = $payment_method;
 
 		// Add filters and actions.
@@ -84,7 +77,19 @@ class Gateway {
 	 * @since   2.0.3
 	 */
 	public function gateways_sections( $sections ) {
-		$sections[ $this->id ] = $this->name;
+		// Section title.
+		$title = \__( 'Pronamic', 'pronamic_ideal' );
+
+		if ( null !== $this->payment_method ) {
+			$title = \sprintf(
+				'%s - %s',
+				$title,
+				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
+			);
+		}
+
+		// Set section.
+		$sections[ $this->id ] = $title;
 
 		return $sections;
 	}

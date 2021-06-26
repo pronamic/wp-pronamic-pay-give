@@ -93,30 +93,53 @@ class Extension extends AbstractPluginIntegration {
 		if ( null === $this->gateways ) {
 			$this->gateways = array();
 
-			$classes = array(
-				'Gateway',
-				'BancontactGateway',
-				'BankTransferGateway',
-				'CreditCardGateway',
-				'DirectDebitGateway',
-				'IDealGateway',
-				'SofortGateway',
+			// Get active and remove unsupported recurring-only payment methods.
+			$payment_methods = array_merge( array( null ), PaymentMethods::get_active_payment_methods() );
+
+			$payment_methods = array_diff(
+				$payment_methods,
+				\array_keys( PaymentMethods::get_direct_debit_methods() )
 			);
 
-			if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
-				$classes[] = 'GuldenGateway';
-			}
+			// Create gateways for payment methods.
+			foreach ( $payment_methods as $payment_method ) {
+				// Gateway identifier.
+				$id = 'pronamic_pay';
 
-			foreach ( $classes as $class ) {
-				$class = __NAMESPACE__ . '\\' . $class;
+				if ( ! empty( $payment_method ) ) {
+					$id = \sprintf( 'pronamic_pay_%s', $payment_method );
 
-				$gateway = new $class();
+					// Use `mister_cash` instead of `bancontact` for backwards compatibility.
+					if ( PaymentMethods::BANCONTACT === $payment_method ) {
+						$id = 'pronamic_pay_mister_cash';
+					}
+				}
+
+				// New gateway.
+				$gateway = new Gateway( $id, $payment_method );
+
+				$name = PaymentMethods::get_name( $payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+
+				// Admin label.
+				$admin_label = \__( 'Pronamic', 'pronamic_ideal' );
+
+				if ( null !== $payment_method ) {
+					$admin_label = sprintf( '%s - %s', \__( 'Pronamic', 'pronamic_ideal' ), $name );
+				}
 
 				$this->gateways[ $gateway->id ] = array(
-					'admin_label'    => $gateway->name,
-					'checkout_label' => $gateway->name,
+					'admin_label'    => $admin_label,
+					'checkout_label' => $name,
 				);
 			}
+
+			// Sort gateways alphabetically.
+			uasort(
+				$this->gateways,
+				function ( $a, $b ) {
+					return strnatcasecmp( $a['admin_label'], $b['admin_label'] );
+				}
+			);
 		}
 
 		return array_merge( $gateways, $this->gateways );
