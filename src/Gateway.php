@@ -12,7 +12,7 @@ namespace Pronamic\WordPress\Pay\Extensions\Give;
 
 use Give\Helpers\Form\Utils as FormUtils;
 use Pronamic\WordPress\Money\Currency;
-use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -322,7 +322,7 @@ class Gateway {
 		$currency = Currency::get_instance( \give_get_payment_currency_code( $donation_id ) );
 
 		// Amount.
-		$payment->set_total_amount( new TaxedMoney( \give_donation_amount( $donation_id ), $currency ) );
+		$payment->set_total_amount( new Money( \give_donation_amount( $donation_id ), $currency ) );
 
 		// Method.
 		$payment->method = $this->payment_method;
