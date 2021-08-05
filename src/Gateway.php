@@ -12,7 +12,8 @@ namespace Pronamic\WordPress\Pay\Extensions\Give;
 
 use Give\Helpers\Form\Utils as FormUtils;
 use Pronamic\WordPress\Money\Currency;
-use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
@@ -42,22 +43,14 @@ class Gateway {
 	public $id;
 
 	/**
-	 * Name.
-	 *
-	 * @var string
-	 */
-	public $name;
-
-	/**
 	 * Constructs and initialize a gateway.
 	 *
 	 * @param string $id             Gateway ID.
 	 * @param string $name           Gateway name.
 	 * @param string $payment_method Gateway payment method.
 	 */
-	public function __construct( $id = 'pronamic_pay', $name = 'Pronamic', $payment_method = null ) {
+	public function __construct( $id = 'pronamic_pay', $payment_method = null ) {
 		$this->id             = $id;
-		$this->name           = $name;
 		$this->payment_method = $payment_method;
 
 		// Add filters and actions.
@@ -84,7 +77,19 @@ class Gateway {
 	 * @since   2.0.3
 	 */
 	public function gateways_sections( $sections ) {
-		$sections[ $this->id ] = $this->name;
+		// Section title.
+		$title = \__( 'Pronamic', 'pronamic_ideal' );
+
+		if ( null !== $this->payment_method ) {
+			$title = \sprintf(
+				'%s - %s',
+				$title,
+				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
+			);
+		}
+
+		// Set section.
+		$sections[ $this->id ] = $title;
 
 		return $sections;
 	}
@@ -317,7 +322,7 @@ class Gateway {
 		$currency = Currency::get_instance( \give_get_payment_currency_code( $donation_id ) );
 
 		// Amount.
-		$payment->set_total_amount( new TaxedMoney( \give_donation_amount( $donation_id ), $currency ) );
+		$payment->set_total_amount( new Money( \give_donation_amount( $donation_id ), $currency ) );
 
 		// Method.
 		$payment->method = $this->payment_method;
@@ -331,6 +336,8 @@ class Gateway {
 
 			// Redirect.
 			\wp_safe_redirect( $payment->get_pay_redirect_url(), 303 );
+
+			exit;
 		} catch ( \Exception $e ) {
 			/*
 			 * Record the error.
