@@ -336,6 +336,8 @@ class Gateway {
 
 			// Redirect.
 			\wp_safe_redirect( $payment->get_pay_redirect_url(), 303 );
+
+			exit;
 		} catch ( \Exception $e ) {
 			/*
 			 * Record the error.
