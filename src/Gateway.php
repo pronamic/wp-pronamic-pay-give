@@ -178,6 +178,10 @@ class Gateway {
 		try {
 			$gateway = Plugin::get_gateway( $config_id );
 
+			if ( null === $gateway ) {
+				return;
+			}
+
 			$gateway->set_payment_method( $this->payment_method );
 
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

@@ -14,6 +14,7 @@ use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: Give extension
@@ -77,6 +78,7 @@ class Extension extends AbstractPluginIntegration {
 		\add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( $this, 'redirect_url' ), 10, 2 );
 
 		\add_filter( 'give_payment_gateways', array( $this, 'give_payment_gateways' ) );
+		\add_filter( 'give_enabled_payment_gateways', array( $this, 'give_enabled_payment_gateways' ) );
 		\add_filter( 'give_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
 	}
 
@@ -143,6 +145,36 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		return array_merge( $gateways, $this->gateways );
+	}
+
+
+	/**
+	 * Give enabled payment gateways.
+	 *
+	 * @param array $gateways Gateways.
+	 * @return array
+	 */
+	public function give_enabled_payment_gateways( $gateways ) {
+		foreach ( $gateways as $key => $gateway ) {
+			// Check if gateway is ours.
+			if ( 'pronamic_pay' !== \substr( $key, 0, 12 ) ) {
+				continue;
+			}
+
+			// Get configuration ID.
+			$config_id = \give_get_option( \sprintf( 'give_%s_configuration', $key ) );
+
+			if ( empty( $config_id ) ) {
+				$config_id = \get_option( 'pronamic_pay_config_id' );
+			}
+
+			// Check if gateway exists for given configuration ID.
+			if ( null === Plugin::get_gateway( $config_id ) ) {
+				unset( $gateways[ $key ] );
+			}
+		}
+
+		return $gateways;
 	}
 
 	/**
