@@ -312,7 +312,7 @@ class Gateway {
 		$payment->source_id = $donation_id;
 		$payment->order_id  = $donation_id;
 
-		$payment->description = GiveHelper::get_description( $this, $donation_id );
+		$payment->set_description( GiveHelper::get_description( $this, $donation_id ) );
 
 		$payment->title = GiveHelper::get_title( $donation_id );
 
