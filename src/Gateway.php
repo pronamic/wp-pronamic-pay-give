@@ -328,8 +328,8 @@ class Gateway {
 		// Amount.
 		$payment->set_total_amount( new Money( \give_donation_amount( $donation_id ), $currency ) );
 
-		// Method.
-		$payment->method = $this->payment_method;
+		// Payment method.
+		$payment->set_payment_method( $this->payment_method );
 
 		// Configuration.
 		$payment->config_id = $config_id;
