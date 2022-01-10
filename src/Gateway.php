@@ -3,7 +3,7 @@
  * Gateway
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
@@ -20,7 +20,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 /**
  * Title: Give gateway
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
@@ -178,6 +178,10 @@ class Gateway {
 		try {
 			$gateway = Plugin::get_gateway( $config_id );
 
+			if ( null === $gateway ) {
+				return;
+			}
+
 			$gateway->set_payment_method( $this->payment_method );
 
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -308,7 +312,7 @@ class Gateway {
 		$payment->source_id = $donation_id;
 		$payment->order_id  = $donation_id;
 
-		$payment->description = GiveHelper::get_description( $this, $donation_id );
+		$payment->set_description( GiveHelper::get_description( $this, $donation_id ) );
 
 		$payment->title = GiveHelper::get_title( $donation_id );
 
@@ -324,8 +328,8 @@ class Gateway {
 		// Amount.
 		$payment->set_total_amount( new Money( \give_donation_amount( $donation_id ), $currency ) );
 
-		// Method.
-		$payment->method = $this->payment_method;
+		// Payment method.
+		$payment->set_payment_method( $this->payment_method );
 
 		// Configuration.
 		$payment->config_id = $config_id;
