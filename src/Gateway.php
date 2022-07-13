@@ -182,8 +182,6 @@ class Gateway {
 				return;
 			}
 
-			$gateway->set_payment_method( $this->payment_method );
-
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo $gateway->get_input_html();
 		} catch ( \Exception $e ) {
@@ -298,8 +296,6 @@ class Gateway {
 		if ( null === $gateway ) {
 			return;
 		}
-
-		$gateway->set_payment_method( $this->payment_method );
 
 		$user_info = \give_get_payment_meta_user_info( $donation_id );
 
