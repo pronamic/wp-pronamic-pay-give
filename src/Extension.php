@@ -98,11 +98,6 @@ class Extension extends AbstractPluginIntegration {
 			// Get active and remove unsupported recurring-only payment methods.
 			$payment_methods = array_merge( array( null ), PaymentMethods::get_active_payment_methods() );
 
-			$payment_methods = array_diff(
-				$payment_methods,
-				\array_keys( PaymentMethods::get_direct_debit_methods() )
-			);
-
 			// Create gateways for payment methods.
 			foreach ( $payment_methods as $payment_method ) {
 				// Gateway identifier.

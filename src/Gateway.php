@@ -175,17 +175,22 @@ class Gateway {
 		// Gateway.
 		$config_id = $this->get_config_id();
 
+		$gateway = Plugin::get_gateway( $config_id );
+
+		if ( null === $gateway ) {
+			return;
+		}
+
+		$payment_method = $gateway->get_payment_method( $this->payment_method );
+
+		if ( null === $payment_method ) {
+			return;
+		}
+
 		try {
-			$gateway = Plugin::get_gateway( $config_id );
-
-			if ( null === $gateway ) {
-				return;
+			foreach ( $payment_method->get_fields() as $field ) {
+				$field->output();
 			}
-
-			$gateway->set_payment_method( $this->payment_method );
-
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo $gateway->get_input_html();
 		} catch ( \Exception $e ) {
 			printf(
 				'<div class="give_error">%s<br /><br />%s</div>',
@@ -298,8 +303,6 @@ class Gateway {
 		if ( null === $gateway ) {
 			return;
 		}
-
-		$gateway->set_payment_method( $this->payment_method );
 
 		$user_info = \give_get_payment_meta_user_info( $donation_id );
 
