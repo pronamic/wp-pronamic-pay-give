@@ -79,7 +79,6 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_filter( 'give_payment_gateways', array( $this, 'give_payment_gateways' ) );
 		\add_filter( 'give_enabled_payment_gateways', array( $this, 'give_enabled_payment_gateways' ) );
-		\add_filter( 'give_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
 	}
 
 	/**
@@ -229,30 +228,6 @@ class Extension extends AbstractPluginIntegration {
 
 				break;
 		}
-	}
-
-	/**
-	 * Filter currencies.
-	 *
-	 * @param array $currencies Available currencies.
-	 *
-	 * @return mixed
-	 */
-	public static function currencies( $currencies ) {
-		if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
-			$currencies['NLG'] = array(
-				'admin_label' => PaymentMethods::get_name( PaymentMethods::GULDEN ) . ' (G)',
-				'symbol'      => 'G',
-				'setting'     => array(
-					'currency_position'   => 'before',
-					'thousands_separator' => '',
-					'decimal_separator'   => '.',
-					'number_decimals'     => 4,
-				),
-			);
-		}
-
-		return $currencies;
 	}
 
 	/**
