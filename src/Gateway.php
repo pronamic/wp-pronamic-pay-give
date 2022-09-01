@@ -54,18 +54,18 @@ class Gateway {
 		$this->payment_method = $payment_method;
 
 		// Add filters and actions.
-		add_filter( 'give_get_settings_gateways', array( $this, 'gateway_settings' ) );
-		add_filter( 'give_get_sections_gateways', array( $this, 'gateways_sections' ) );
+		add_filter( 'give_get_settings_gateways', [ $this, 'gateway_settings' ] );
+		add_filter( 'give_get_sections_gateways', [ $this, 'gateways_sections' ] );
 
-		add_action( 'give_gateway_' . $this->id, array( $this, 'process_purchase' ) );
+		add_action( 'give_gateway_' . $this->id, [ $this, 'process_purchase' ] );
 
 		if ( defined( 'GIVE_VERSION' ) && version_compare( GIVE_VERSION, '1.7', '>=' ) ) {
-			add_action( 'give_donation_form_before_submit', array( $this, 'before_submit_input_fields' ) );
+			add_action( 'give_donation_form_before_submit', [ $this, 'before_submit_input_fields' ] );
 		} else {
-			add_action( 'give_purchase_form_before_submit', array( $this, 'before_submit_input_fields' ) );
+			add_action( 'give_purchase_form_before_submit', [ $this, 'before_submit_input_fields' ] );
 		}
 
-		add_action( 'give_' . $this->id . '_cc_form', array( $this, 'payment_fields' ) );
+		add_action( 'give_' . $this->id . '_cc_form', [ $this, 'payment_fields' ] );
 	}
 
 	/**
@@ -116,22 +116,22 @@ class Gateway {
 			$description = __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' );
 		}
 
-		$settings[] = array(
+		$settings[] = [
 			'desc' => $description,
 			'id'   => sprintf( 'give_title_%s', $this->id ),
 			'type' => 'title',
-		);
+		];
 
-		$settings[] = array(
+		$settings[] = [
 			'name'    => __( 'Configuration', 'pronamic_ideal' ),
 			'desc'    => '',
 			'id'      => sprintf( 'give_%s_configuration', $this->id ),
 			'type'    => 'select',
 			'options' => Plugin::get_config_select_options( $this->payment_method ),
 			'default' => $this->get_config_id(),
-		);
+		];
 
-		$settings[] = array(
+		$settings[] = [
 			'name'    => __( 'Transaction description', 'pronamic_ideal' ),
 			'desc'    => sprintf(
 				/* translators: %s: <code>{tag}</code> */
@@ -141,12 +141,12 @@ class Gateway {
 			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
 			'type'    => 'text',
 			'default' => __( 'Give donation {donation_id}', 'pronamic_ideal' ),
-		);
+		];
 
-		$settings[] = array(
+		$settings[] = [
 			'id'   => sprintf( 'give_title_gateway_settings_%s', $this->id ),
 			'type' => 'sectionend',
-		);
+		];
 
 		return $settings;
 	}
@@ -257,13 +257,13 @@ class Gateway {
 	 */
 	public function process_purchase( $purchase_data ) {
 		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'give-gateway' ) ) {
-			wp_die( esc_html__( 'Nonce verification has failed', 'pronamic_ideal' ), esc_html__( 'Error', 'pronamic_ideal' ), array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Nonce verification has failed', 'pronamic_ideal' ), esc_html__( 'Error', 'pronamic_ideal' ), [ 'response' => 403 ] );
 		}
 
 		$form_id = intval( $purchase_data['post_data']['give-form-id'] );
 
 		// Collect payment data.
-		$payment_data = array(
+		$payment_data = [
 			'price'           => $purchase_data['price'],
 			'give_form_title' => $purchase_data['post_data']['give-form-title'],
 			'give_form_id'    => $form_id,
@@ -274,7 +274,7 @@ class Gateway {
 			'user_info'       => $purchase_data['user_info'],
 			'status'          => 'pending',
 			'gateway'         => $this->id,
-		);
+		];
 
 		// Record the pending payment.
 		$donation_id = give_insert_payment( $payment_data );
@@ -299,10 +299,10 @@ class Gateway {
 			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
 			 */
 			give_send_back_to_checkout(
-				array(
+				[
 					'payment-error' => true,
 					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
-				)
+				]
 			);
 
 			return;
@@ -374,10 +374,10 @@ class Gateway {
 			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
 			 */
 			give_send_back_to_checkout(
-				array(
+				[
 					'payment-error' => true,
 					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
-				)
+				]
 			);
 		}
 	}

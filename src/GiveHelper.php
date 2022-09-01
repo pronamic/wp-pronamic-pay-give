@@ -44,13 +44,13 @@ class GiveHelper {
 	 * @return string
 	 */
 	public static function get_description( $gateway, $donation_id ) {
-		$search = array(
+		$search = [
 			'{donation_id}',
-		);
+		];
 
-		$replace = array(
+		$replace = [
 			$donation_id,
-		);
+		];
 
 		$description = $gateway->get_transaction_description();
 
@@ -81,12 +81,12 @@ class GiveHelper {
 	 */
 	public static function get_customer_from_user_info( $user_info, $donation_id ) {
 		return CustomerHelper::from_array(
-			array(
+			[
 				'name'    => self::get_name_from_user_info( $user_info ),
 				'email'   => \give_get_payment_user_email( $donation_id ),
 				'phone'   => null,
 				'user_id' => null,
-			)
+			]
 		);
 	}
 
@@ -97,10 +97,10 @@ class GiveHelper {
 	 */
 	public static function get_name_from_user_info( $user_info ) {
 		return ContactNameHelper::from_array(
-			array(
+			[
 				'first_name' => self::get_value_from_array( $user_info, 'first_name' ),
 				'last_name'  => self::get_value_from_array( $user_info, 'last_name' ),
-			)
+			]
 		);
 	}
 
@@ -113,7 +113,7 @@ class GiveHelper {
 		$address_info = self::get_value_from_array( $user_info, 'address' );
 
 		return AddressHelper::from_array(
-			array(
+			[
 				'name'         => self::get_name_from_user_info( $user_info ),
 				'line_1'       => self::get_value_from_array( $address_info, 'line1' ),
 				'line_2'       => self::get_value_from_array( $address_info, 'line2' ),
@@ -123,7 +123,7 @@ class GiveHelper {
 				'country_code' => null,
 				'email'        => \give_get_payment_user_email( $donation_id ),
 				'phone'        => null,
-			)
+			]
 		);
 	}
 }
