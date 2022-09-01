@@ -189,7 +189,19 @@ class Gateway {
 
 		try {
 			foreach ( $payment_method->get_fields() as $field ) {
-				$field->output();
+				?>
+				<p class="form-row form-row-wide">
+					<label class="give-label">
+						<?php echo \esc_html( $field->get_label() ); ?>
+
+						<?php if ( $field->is_required() ) : ?>
+							<span class="give-required-indicator">*</span>
+						<?php endif; ?>
+					</label>
+
+					<?php $field->output(); ?>
+				</p>
+				<?php
 			}
 		} catch ( \Exception $e ) {
 			printf(
