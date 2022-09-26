@@ -48,9 +48,9 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	public function __construct() {
 		parent::__construct(
-			array(
+			[
 				'name' => __( 'Give', 'pronamic_ideal' ),
-			)
+			]
 		);
 
 		// Dependencies.
@@ -65,21 +65,20 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function setup() {
-		\add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( $this, 'source_description' ), 10, 2 );
-		\add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( $this, 'source_text' ), 10, 2 );
-		\add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( $this, 'source_url' ), 10, 2 );
+		\add_filter( 'pronamic_payment_source_description_' . self::SLUG, [ $this, 'source_description' ], 10, 2 );
+		\add_filter( 'pronamic_payment_source_text_' . self::SLUG, [ $this, 'source_text' ], 10, 2 );
+		\add_filter( 'pronamic_payment_source_url_' . self::SLUG, [ $this, 'source_url' ], 10, 2 );
 
 		// Check if dependencies are met and integration is active.
 		if ( ! $this->is_active() ) {
 			return;
 		}
 
-		\add_action( 'pronamic_payment_status_update_' . self::SLUG, array( $this, 'status_update' ), 10, 1 );
-		\add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( $this, 'redirect_url' ), 10, 2 );
+		\add_action( 'pronamic_payment_status_update_' . self::SLUG, [ $this, 'status_update' ], 10, 1 );
+		\add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, [ $this, 'redirect_url' ], 10, 2 );
 
-		\add_filter( 'give_payment_gateways', array( $this, 'give_payment_gateways' ) );
-		\add_filter( 'give_enabled_payment_gateways', array( $this, 'give_enabled_payment_gateways' ) );
-		\add_filter( 'give_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
+		\add_filter( 'give_payment_gateways', [ $this, 'give_payment_gateways' ] );
+		\add_filter( 'give_enabled_payment_gateways', [ $this, 'give_enabled_payment_gateways' ] );
 	}
 
 	/**
@@ -93,15 +92,10 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	public function give_payment_gateways( $gateways ) {
 		if ( null === $this->gateways ) {
-			$this->gateways = array();
+			$this->gateways = [];
 
 			// Get active and remove unsupported recurring-only payment methods.
-			$payment_methods = array_merge( array( null ), PaymentMethods::get_active_payment_methods() );
-
-			$payment_methods = array_diff(
-				$payment_methods,
-				\array_keys( PaymentMethods::get_direct_debit_methods() )
-			);
+			$payment_methods = array_merge( [ null ], PaymentMethods::get_active_payment_methods() );
 
 			// Create gateways for payment methods.
 			foreach ( $payment_methods as $payment_method ) {
@@ -129,10 +123,10 @@ class Extension extends AbstractPluginIntegration {
 					$admin_label = sprintf( '%s - %s', \__( 'Pronamic', 'pronamic_ideal' ), $name );
 				}
 
-				$this->gateways[ $gateway->id ] = array(
+				$this->gateways[ $gateway->id ] = [
 					'admin_label'    => $admin_label,
 					'checkout_label' => $name,
-				);
+				];
 			}
 
 			// Sort gateways alphabetically.
@@ -234,30 +228,6 @@ class Extension extends AbstractPluginIntegration {
 
 				break;
 		}
-	}
-
-	/**
-	 * Filter currencies.
-	 *
-	 * @param array $currencies Available currencies.
-	 *
-	 * @return mixed
-	 */
-	public static function currencies( $currencies ) {
-		if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
-			$currencies['NLG'] = array(
-				'admin_label' => PaymentMethods::get_name( PaymentMethods::GULDEN ) . ' (G)',
-				'symbol'      => 'G',
-				'setting'     => array(
-					'currency_position'   => 'before',
-					'thousands_separator' => '',
-					'decimal_separator'   => '.',
-					'number_decimals'     => 4,
-				),
-			);
-		}
-
-		return $currencies;
 	}
 
 	/**
