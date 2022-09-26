@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.1.0] - 2022-09-26
+- Updated for new payment methods and fields registration.
+
 ## [4.0.0] - 2022-01-10
 ### Changed
 - Updated to https://github.com/pronamic/wp-pay-core/releases/tag/4.0.0.
@@ -76,7 +79,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2016-03-23
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/give/compare/4.0.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/give/compare/4.1.0...HEAD
+[4.1.0]: https://github.com/pronamic/wp-pronamic-pay-give/compare/4.0.0...4.1.0
 [4.0.0]: https://github.com/wp-pay-extensions/give/compare/3.0.0...4.0.0
 [3.0.0]: https://github.com/wp-pay-extensions/give/compare/2.2.1...3.0.0
 [2.2.1]: https://github.com/wp-pay-extensions/give/compare/2.2.0...2.2.1
