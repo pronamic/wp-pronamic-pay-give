@@ -4,7 +4,7 @@
  * Plugin URI: https://www.pronamic.eu/plugins/pronamic-pay-give/
  * Description: Extend the Pronamic Pay plugin with Give support to receive payments through a variety of payment providers.
  *
- * Version: 4.1.0
+ * Version: 4.1.1
  * Requires at least: 4.7
  *
  * Author: Pronamic
