@@ -7,6 +7,21 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.2.0] - 2022-12-23
+
+### Commits
+
+- Added "Requires Plugins" header. ([f81a66b](https://github.com/pronamic/wp-pronamic-pay-give/commit/f81a66bb75a1f0b1b419bfeacc34e9ced6b1f72c))
+
+### Composer
+
+- Changed `php` from `>=5.6.20` to `>=8.0`.
+- Changed `wp-pay/core` from `^4.4` to `v4.6.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.1.1
+Full set of changes: [`4.1.1...4.2.0`][4.2.0]
+
+[4.2.0]: https://github.com/pronamic/wp-pronamic-pay-give/compare/v4.1.1...v4.2.0
+
 ## [4.1.1] - 2022-09-27
 - Update to `wp-pay/core` version `^4.4`.
 
