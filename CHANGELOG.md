@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.2.3] - 2023-06-01
+
+### Commits
+
+- Switch from `pronamic/wp-deployer` to `pronamic/pronamic-cli`. ([895a744](https://github.com/pronamic/wp-pronamic-pay-give/commit/895a7444e7222f3c323660365ac9672b431069ff))
+- Updated .gitattributes ([ccbe6b0](https://github.com/pronamic/wp-pronamic-pay-give/commit/ccbe6b08a361c08fa5447302aeb6a14101600e2c))
+
+Full set of changes: [`4.2.2...4.2.3`][4.2.3]
+
+[4.2.3]: https://github.com/pronamic/wp-pronamic-pay-give/compare/v4.2.2...v4.2.3
+
 ## [4.2.2] - 2023-03-27
 
 ### Commits
