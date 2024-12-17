@@ -37,6 +37,9 @@
 			"roots/wordpress-core-installer": true,
 			"bamarni/composer-bin-plugin": true,
 			"automattic/jetpack-autoloader": true
+		},
+		"platform": {
+			"php": "8.1"
 		}
 	},
 	"repositories":[
