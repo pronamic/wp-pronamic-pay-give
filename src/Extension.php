@@ -49,7 +49,7 @@ class Extension extends AbstractPluginIntegration {
 	public function __construct() {
 		parent::__construct(
 			[
-				'name' => __( 'Give', 'pronamic_ideal' ),
+				'name' => 'Give',
 			]
 		);
 
