@@ -10,7 +10,11 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Give\Framework\PaymentGateways\PaymentGateway;
+use Give\Framework\PaymentGateways\Commands\RedirectOffsite;
+use Give\Framework\PaymentGateways\SubscriptionModule;
 use Give\Helpers\Form\Utils as FormUtils;
+use Give\Donations\Models\Donation;
 use Pronamic\WordPress\Money\Currency;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
@@ -27,11 +31,11 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * @version 2.0.4
  * @since   1.0.0
  */
-class Gateway {
+class Gateway extends PaymentGateway {
 	/**
 	 * The payment method
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $payment_method;
 
@@ -45,11 +49,23 @@ class Gateway {
 	/**
 	 * Constructs and initialize a gateway.
 	 *
-	 * @param string $id             Gateway ID.
-	 * @param string $name           Gateway name.
-	 * @param string $payment_method Gateway payment method.
+	 * @param string|SubscriptionModule|null $id             Gateway ID or subscription module.
+	 * @param string|null                    $payment_method Gateway payment method.
 	 */
 	public function __construct( $id = 'pronamic_pay', $payment_method = null ) {
+		$subscription_module = null;
+
+		if ( $id instanceof SubscriptionModule ) {
+			$subscription_module = $id;
+			$id                  = static::id();
+		}
+
+		if ( null === $id ) {
+			$id = static::id();
+		}
+
+		parent::__construct( $subscription_module );
+
 		$this->id             = $id;
 		$this->payment_method = $payment_method;
 
@@ -66,6 +82,51 @@ class Gateway {
 		}
 
 		add_action( 'give_' . $this->id . '_cc_form', [ $this, 'payment_fields' ] );
+	}
+
+	/**
+	 * Get gateway unique identifier.
+	 *
+	 * @return string
+	 */
+	public static function id(): string {
+		return 'pronamic_pay';
+	}
+
+	/**
+	 * Get gateway unique identifier.
+	 *
+	 * @return string
+	 */
+	public function getId(): string {
+		return $this->id;
+	}
+
+	/**
+	 * Get gateway name.
+	 *
+	 * @return string
+	 */
+	public function getName(): string {
+		return PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+	}
+
+	/**
+	 * Get payment method label.
+	 *
+	 * @return string
+	 */
+	public function getPaymentMethodLabel(): string {
+		return $this->getName();
+	}
+
+	/**
+	 * Enqueue scripts for VFB forms.
+	 *
+	 * @param int $form_id Form ID.
+	 * @return void
+	 */
+	public function enqueueScript( int $form_id ) {
 	}
 
 	/**
@@ -247,6 +308,21 @@ class Gateway {
 	}
 
 	/**
+	 * Get legacy form field markup.
+	 *
+	 * @param int   $form_id Form ID.
+	 * @param array $args    Arguments.
+	 * @return string
+	 */
+	public function getLegacyFormFieldMarkup( int $form_id, array $args ): string {
+		ob_start();
+
+		$this->input_fields( $form_id );
+
+		return (string) ob_get_clean();
+	}
+
+	/**
 	 * Process purchase.
 	 *
 	 * @since 1.0.0
@@ -331,25 +407,18 @@ class Gateway {
 
 		$payment->title = GiveHelper::get_title( $donation_id );
 
-		// Customer.
 		$payment->set_customer( GiveHelper::get_customer_from_user_info( $user_info, $donation_id ) );
 
-		// Address.
 		$payment->set_billing_address( GiveHelper::get_address_from_user_info( $user_info, $donation_id ) );
 
-		// Currency.
 		$currency = Currency::get_instance( \give_get_payment_currency_code( $donation_id ) );
 
-		// Amount.
 		$payment->set_total_amount( new Money( \give_donation_amount( $donation_id ), $currency ) );
 
-		// Payment method.
 		$payment->set_payment_method( $this->payment_method );
 
-		// Configuration.
 		$payment->config_id = $config_id;
 
-		// Start.
 		try {
 			$payment = Plugin::start_payment( $payment );
 
@@ -406,5 +475,79 @@ class Gateway {
 		}
 
 		return $config_id;
+	}
+
+	/**
+	 * Create payment from donation.
+	 *
+	 * @param Donation $donation       Donation model.
+	 * @param mixed    $gateway_data   Gateway data from form submission.
+	 *
+	 * @return RedirectOffsite
+	 */
+	public function createPayment( Donation $donation, $gateway_data ): RedirectOffsite {
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$donation_id = (int) $donation->id;
+
+		$user_info = [
+			'first_name' => $donation->firstName,
+			'last_name'  => $donation->lastName,
+			'email'      => $donation->email,
+			'address'    => $donation->billingAddress->address1 ?? '',
+			'address_2'  => $donation->billingAddress->address2 ?? '',
+			'city'       => $donation->billingAddress->city ?? '',
+			'state'      => $donation->billingAddress->state ?? '',
+			'zip'        => $donation->billingAddress->postalCode ?? '',
+			'country'    => $donation->billingAddress->country ?? '',
+		];
+		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+
+		$config_id = $this->get_config_id();
+
+		$gateway = Plugin::get_gateway( $config_id );
+
+		if ( null === $gateway ) {
+			throw new \Exception( __( 'Payment gateway not configured.', 'pronamic_ideal' ) );
+		}
+
+		$payment = new Payment();
+
+		$payment->source    = 'give';
+		$payment->source_id = $donation_id;
+		$payment->order_id  = $donation_id;
+
+		$payment->set_description( GiveHelper::get_description( $this, $donation_id ) );
+
+		$payment->title = GiveHelper::get_title( $donation_id );
+
+		$payment->set_customer( GiveHelper::get_customer_from_user_info( $user_info, $donation_id ) );
+
+		$payment->set_billing_address( GiveHelper::get_address_from_user_info( $user_info, $donation_id ) );
+
+		$currency = Currency::get_instance( $donation->currency->code );
+
+		$payment->set_total_amount( new Money( $donation->amount->getAmount(), $currency ) );
+
+		$payment->set_payment_method( $this->payment_method );
+
+		$payment->config_id = $config_id;
+
+		try {
+			$payment = Plugin::start_payment( $payment );
+
+			return new RedirectOffsite( $payment->get_pay_redirect_url() );
+		} catch ( \Exception $e ) {
+			throw new \Exception( __( 'Payment creation failed.', 'pronamic_ideal' ) . ' ' . $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Refund donation.
+	 *
+	 * @param Donation $donation Donation.
+	 * @return void
+	 */
+	public function refundDonation( Donation $donation ) {
+		throw new \Exception( __( 'Refund is not supported by this gateway.', 'pronamic_ideal' ) );
 	}
 }

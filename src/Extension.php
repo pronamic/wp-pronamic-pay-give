@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Give\Framework\PaymentGateways\PaymentGatewayRegister;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
@@ -35,11 +36,11 @@ class Extension extends AbstractPluginIntegration {
 	const SLUG = 'give';
 
 	/**
-	 * Gateways.
+	 * Payment gateway class names by gateway key.
 	 *
-	 * @var array|null
+	 * @var array<string, string>
 	 */
-	private $gateways;
+	private $payment_gateway_classes = [];
 
 	/**
 	 * Construct Give plugin integration.
@@ -77,12 +78,74 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'pronamic_payment_status_update_' . self::SLUG, [ $this, 'status_update' ], 10, 1 );
 		\add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, [ $this, 'redirect_url' ], 10, 2 );
 
-		\add_filter( 'give_payment_gateways', [ $this, 'give_payment_gateways' ] );
-		\add_filter( 'give_enabled_payment_gateways', [ $this, 'give_enabled_payment_gateways' ] );
+		\add_filter( 'give_payment_gateways', $this->give_payment_gateways( ... ) );
+		\add_filter( 'give_enabled_payment_gateways', $this->give_enabled_payment_gateways( ... ) );
+
+		if ( \class_exists( PaymentGatewayRegister::class ) ) {
+			\add_action( 'givewp_register_payment_gateway', $this->register_payment_gateways( ... ) );
+		}
 	}
 
 	/**
-	 * Give payments gateways.
+	 * Get gateways.
+	 *
+	 * @return array
+	 */
+	private function get_gateways() {
+		$gateways = [];
+
+		// PaymentMethods::update_active_payment_methods();
+
+		// Get active payment methods.
+		$payment_methods = array_merge( [ null ], PaymentMethods::get_active_payment_methods() );
+
+		// Create gateways for payment methods.
+		foreach ( $payment_methods as $payment_method ) {
+			// Gateway identifier.
+			$id = 'pronamic_pay';
+
+			if ( ! empty( $payment_method ) ) {
+				$id = \sprintf( 'pronamic_pay_%s', $payment_method );
+
+				// Use `mister_cash` instead of `bancontact` for backwards compatibility.
+				if ( PaymentMethods::BANCONTACT === $payment_method ) {
+					$id = 'pronamic_pay_mister_cash';
+				}
+			}
+
+			// New gateway.
+			$gateway = new Gateway( $id, $payment_method );
+
+			$name = PaymentMethods::get_name( $payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+
+			// Admin label.
+			$admin_label = \__( 'Pronamic', 'pronamic_ideal' );
+
+			if ( null !== $payment_method ) {
+				$admin_label = sprintf( '%s - %s', \__( 'Pronamic', 'pronamic_ideal' ), $name );
+			}
+
+			$gateways[ $id ] = [
+				'instance'       => $gateway,
+				'payment_method' => $payment_method,
+				'admin_label'    => $admin_label,
+				'checkout_label' => $name,
+			];
+		}
+
+		// Sort gateways alphabetically.
+		uasort(
+			$gateways,
+			function ( $a, $b ) {
+				return strnatcasecmp( $a['admin_label'], $b['admin_label'] );
+			}
+		);
+
+		return $gateways;
+	}
+
+	/**
+	 * Classic Give payment gateways.
 	 *
 	 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L37
 	 *
@@ -90,57 +153,78 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @return array
 	 */
-	public function give_payment_gateways( $gateways ) {
-		if ( null === $this->gateways ) {
-			$this->gateways = [];
+	private function give_payment_gateways( $gateways ) {
+		$legacy_gateways = [];
 
-			// Get active and remove unsupported recurring-only payment methods.
-			$payment_methods = array_merge( [ null ], PaymentMethods::get_active_payment_methods() );
-
-			// Create gateways for payment methods.
-			foreach ( $payment_methods as $payment_method ) {
-				// Gateway identifier.
-				$id = 'pronamic_pay';
-
-				if ( ! empty( $payment_method ) ) {
-					$id = \sprintf( 'pronamic_pay_%s', $payment_method );
-
-					// Use `mister_cash` instead of `bancontact` for backwards compatibility.
-					if ( PaymentMethods::BANCONTACT === $payment_method ) {
-						$id = 'pronamic_pay_mister_cash';
-					}
-				}
-
-				// New gateway.
-				$gateway = new Gateway( $id, $payment_method );
-
-				$name = PaymentMethods::get_name( $payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
-
-				// Admin label.
-				$admin_label = \__( 'Pronamic', 'pronamic_ideal' );
-
-				if ( null !== $payment_method ) {
-					$admin_label = sprintf( '%s - %s', \__( 'Pronamic', 'pronamic_ideal' ), $name );
-				}
-
-				$this->gateways[ $gateway->id ] = [
-					'admin_label'    => $admin_label,
-					'checkout_label' => $name,
-				];
-			}
-
-			// Sort gateways alphabetically.
-			uasort(
-				$this->gateways,
-				function ( $a, $b ) {
-					return strnatcasecmp( $a['admin_label'], $b['admin_label'] );
-				}
-			);
+		foreach ( $this->get_gateways() as $gateway_id => $gateway_data ) {
+			$legacy_gateways[ $gateway_id ] = [
+				'admin_label'    => $gateway_data['admin_label'],
+				'checkout_label' => $gateway_data['checkout_label'],
+			];
 		}
 
-		return array_merge( $gateways, $this->gateways );
+		return array_merge( $gateways, $legacy_gateways );
 	}
 
+	/**
+	 * Register payment gateways for visual form builder.
+	 *
+	 * @param PaymentGatewayRegister $payment_gateway_register Payment gateway register.
+	 * @return void
+	 */
+	private function register_payment_gateways( PaymentGatewayRegister $payment_gateway_register ): void {
+		foreach ( $this->get_gateways() as $gateway_id => $gateway_data ) {
+			if ( $payment_gateway_register->hasPaymentGateway( $gateway_id ) ) {
+				continue;
+			}
+
+			$payment_gateway_register->registerGateway(
+				$this->get_payment_gateway_class( $gateway_id, $gateway_data['payment_method'] )
+			);
+		}
+	}
+
+	/**
+	 * Get payment gateway class name for the given gateway ID.
+	 *
+	 * @param string      $gateway_id      Gateway ID.
+	 * @param string|null $payment_method Payment method.
+	 * @return string
+	 */
+	private function get_payment_gateway_class( string $gateway_id, ?string $payment_method ): string {
+		$gateway_key = $gateway_id . '::' . (string) $payment_method;
+
+		if ( \array_key_exists( $gateway_key, $this->payment_gateway_classes ) ) {
+			return $this->payment_gateway_classes[ $gateway_key ];
+		}
+
+		if ( null === $payment_method && 'pronamic_pay' === $gateway_id ) {
+			$this->payment_gateway_classes[ $gateway_key ] = Gateway::class;
+
+			return Gateway::class;
+		}
+
+		$class_name = __NAMESPACE__ . '\\GeneratedGateway_' . md5( $gateway_key );
+
+		if ( ! \class_exists( $class_name, false ) ) {
+			$gateway_id_literal     = var_export( $gateway_id, true );
+			$payment_method_literal = var_export( $payment_method, true );
+
+			$code = sprintf(
+				'namespace %1$s; class %2$s extends Gateway { public static function id(): string { return %3$s; } public function __construct( $subscription_module = null ) { parent::__construct( $subscription_module, %4$s ); } }',
+				__NAMESPACE__,
+				substr( $class_name, strrpos( $class_name, '\\' ) + 1 ),
+				$gateway_id_literal,
+				$payment_method_literal
+			);
+
+			eval( $code );
+		}
+
+		$this->payment_gateway_classes[ $gateway_key ] = $class_name;
+
+		return $class_name;
+	}
 
 	/**
 	 * Give enabled payment gateways.
