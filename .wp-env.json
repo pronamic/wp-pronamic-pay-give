@@ -3,7 +3,7 @@
 	"plugins": [
 		".",
 		"../../../",
-		"https://downloads.wordpress.org/plugin/give.2.22.0.zip",
+		"https://downloads.wordpress.org/plugin/give.4.15.2.zip",
 		"pronamic/wp-pronamic-pay-test-helper",
 		"https://downloads.wordpress.org/plugin/pronamic-client.zip",
 		"https://downloads.wordpress.org/plugin/query-monitor.zip",
@@ -12,5 +12,6 @@
 	],
 	"config": {
 		"PRONAMIC_PAY_DEBUG": true
-	}
+	},
+	"testsEnvironment": false
 }
