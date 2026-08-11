@@ -2,18 +2,6 @@
 	"name": "give",
 	"version": "4.2.5",
 	"description": "Give driver for the WordPress payment processing library.",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/wp-pay-extensions/give"
-	},
-	"keywords": [
-		"wordpress",
-		"wp",
-		"pay",
-		"give",
-		"gateway",
-		"pronamic"
-	],
 	"author": {
 		"name": "Pronamic",
 		"email": "info@pronamic.nl",
@@ -26,11 +14,23 @@
 			"url": "http://www.remcotolsma.nl/"
 		}
 	],
-	"license": "GPL-3.0",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"wp",
+		"pay",
+		"give",
+		"gateway",
+		"pronamic"
+	],
+	"homepage": "http://www.wp-pay.org/extensions/give/",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wp-pay-extensions/give"
+	},
 	"bugs": {
 		"url": "https://github.com/wp-pay-extensions/give/issues"
 	},
-	"homepage": "http://www.wp-pay.org/extensions/give/",
 	"devDependencies": {
 		"@wordpress/env": "^11.12.0",
 		"@wordpress/prettier-config": "^4.52.0",
