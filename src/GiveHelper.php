@@ -64,11 +64,15 @@ class GiveHelper {
 	/**
 	 * Get value from array.
 	 *
-	 * @param array  $array Array.
+	 * @param mixed  $array Array.
 	 * @param string $key   Key.
 	 * @return string|null
 	 */
 	private static function get_value_from_array( $array, $key ) {
+		if ( ! is_array( $array ) ) {
+			return null;
+		}
+
 		if ( ! array_key_exists( $key, $array ) ) {
 			return null;
 		}
@@ -110,17 +114,26 @@ class GiveHelper {
 	 * @return Address|null
 	 */
 	public static function get_address_from_user_info( $user_info, $donation_id ) {
-		$address_info = self::get_value_from_array( $user_info, 'address' );
+		$address_info   = self::get_value_from_array( $user_info, 'address' );
+		$address_line_1 = null;
+		$address_line_2 = null;
+
+		if ( is_array( $address_info ) ) {
+			$address_line_1 = self::get_value_from_array( $address_info, 'line1' );
+			$address_line_2 = self::get_value_from_array( $address_info, 'line2' );
+		} elseif ( is_string( $address_info ) && '' !== $address_info ) {
+			$address_line_1 = $address_info;
+		}
 
 		return AddressHelper::from_array(
 			[
 				'name'         => self::get_name_from_user_info( $user_info ),
-				'line_1'       => self::get_value_from_array( $address_info, 'line1' ),
-				'line_2'       => self::get_value_from_array( $address_info, 'line2' ),
-				'postal_code'  => self::get_value_from_array( $address_info, 'zip' ),
-				'city'         => self::get_value_from_array( $address_info, 'city' ),
-				'region'       => null,
-				'country_code' => null,
+				'line_1'       => $address_line_1,
+				'line_2'       => $address_line_2,
+				'postal_code'  => self::get_value_from_array( $user_info, 'zip' ),
+				'city'         => self::get_value_from_array( $user_info, 'city' ),
+				'region'       => self::get_value_from_array( $user_info, 'state' ),
+				'country_code' => self::get_value_from_array( $user_info, 'country' ),
 				'email'        => \give_get_payment_user_email( $donation_id ),
 				'phone'        => null,
 			]

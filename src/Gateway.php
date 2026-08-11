@@ -127,6 +127,42 @@ class Gateway extends PaymentGateway {
 	 * @return void
 	 */
 	public function enqueueScript( int $form_id ) {
+		$asset_path = __DIR__ . '/../js/dist/index.asset.php';
+		$asset_file = include $asset_path;
+
+		\wp_enqueue_script(
+			'pronamic-pay-give-gateway',
+			\get_block_asset_url( __DIR__ . '/../js/dist/index.js' ),
+			$asset_file['dependencies'],
+			$asset_file['version'],
+			true
+		);
+
+		\wp_add_inline_script(
+			'pronamic-pay-give-gateway',
+			sprintf(
+				'window.PronamicPayGiveGateway.register(%s);',
+				\wp_json_encode(
+					$this->formSettings( $form_id ),
+					JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+				)
+			),
+			'after'
+		);
+	}
+
+	/**
+	 * Send form settings to the JS gateway counterpart.
+	 *
+	 * @param int $form_id Form ID.
+	 * @return array<string, string>
+	 */
+	public function formSettings( int $form_id ): array {
+		return [
+			'id'      => $this->id,
+			'label'   => $this->getPaymentMethodLabel(),
+			'message' => __( 'You will be redirected to complete your payment.', 'pronamic_ideal' ),
+		];
 	}
 
 	/**
@@ -524,9 +560,9 @@ class Gateway extends PaymentGateway {
 
 		$payment->set_billing_address( GiveHelper::get_address_from_user_info( $user_info, $donation_id ) );
 
-		$currency = Currency::get_instance( $donation->currency->code );
+		$currency = Currency::get_instance( \give_get_payment_currency_code( $donation_id ) );
 
-		$payment->set_total_amount( new Money( $donation->amount->getAmount(), $currency ) );
+		$payment->set_total_amount( new Money( $donation->amount->formatToDecimal(), $currency ) );
 
 		$payment->set_payment_method( $this->payment_method );
 

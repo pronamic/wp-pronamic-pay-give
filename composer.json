@@ -1,4 +1,5 @@
 {
+	"version": "100",
 	"name": "wp-pay-extensions/give",
 	"description": "Give driver for the WordPress payment processing library.",
 	"keywords": [

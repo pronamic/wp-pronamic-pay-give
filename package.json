@@ -2,18 +2,6 @@
 	"name": "give",
 	"version": "4.2.5",
 	"description": "Give driver for the WordPress payment processing library.",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/wp-pay-extensions/give"
-	},
-	"keywords": [
-		"wordpress",
-		"wp",
-		"pay",
-		"give",
-		"gateway",
-		"pronamic"
-	],
 	"author": {
 		"name": "Pronamic",
 		"email": "info@pronamic.nl",
@@ -26,13 +14,31 @@
 			"url": "http://www.remcotolsma.nl/"
 		}
 	],
-	"license": "GPL-3.0",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"wp",
+		"pay",
+		"give",
+		"gateway",
+		"pronamic"
+	],
+	"homepage": "http://www.wp-pay.org/extensions/give/",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wp-pay-extensions/give"
+	},
 	"bugs": {
 		"url": "https://github.com/wp-pay-extensions/give/issues"
 	},
-	"homepage": "http://www.wp-pay.org/extensions/give/",
+	"prettier": "@wordpress/prettier-config",
+	"dependencies": {
+		"@wordpress/element": "^8.4.0"
+	},
 	"devDependencies": {
 		"@wordpress/env": "^11.12.0",
+		"@wordpress/prettier-config": "^4.52.0",
+		"@wordpress/scripts": "^34.0.0",
 		"grunt": "^1.6.3",
 		"grunt-contrib-jshint": "^3.2.0",
 		"grunt-phpcs": "^0.4.0",
@@ -44,6 +50,9 @@
 	},
 	"scripts": {
 		"start": "wp-env start && npm run setup && npm run login",
+		"build": "wp-scripts build ./js/src/index.js --output-path=js/dist",
+		"lint:js:src": "wp-scripts lint-js ./js/src",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"setup": "npm-run-all setup-*",
 		"setup-mollie": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
 		"setup-buckaroo-website-key": "wp-env run cli wp config set BUCKAROO_WEBSITE_KEY $BUCKAROO_WEBSITE_KEY",

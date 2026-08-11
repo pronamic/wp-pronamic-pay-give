@@ -43,6 +43,13 @@ class Extension extends AbstractPluginIntegration {
 	private $payment_gateway_classes = [];
 
 	/**
+	 * Give gateways.
+	 *
+	 * @var array<string, array>|null
+	 */
+	private $gateways = null;
+
+	/**
 	 * Construct Give plugin integration.
 	 *
 	 * @return void
@@ -78,8 +85,8 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'pronamic_payment_status_update_' . self::SLUG, [ $this, 'status_update' ], 10, 1 );
 		\add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, [ $this, 'redirect_url' ], 10, 2 );
 
-		\add_filter( 'give_payment_gateways', $this->give_payment_gateways( ... ) );
-		\add_filter( 'give_enabled_payment_gateways', $this->give_enabled_payment_gateways( ... ) );
+//		\add_filter( 'give_payment_gateways', $this->give_payment_gateways( ... ) );
+//		\add_filter( 'give_enabled_payment_gateways', $this->give_enabled_payment_gateways( ... ) );
 
 		if ( \class_exists( PaymentGatewayRegister::class ) ) {
 			\add_action( 'givewp_register_payment_gateway', $this->register_payment_gateways( ... ) );
@@ -92,6 +99,10 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	private function get_gateways() {
+		if ( null !== $this->gateways ) {
+			return $this->gateways;
+		}
+
 		$gateways = [];
 
 		// PaymentMethods::update_active_payment_methods();
@@ -141,7 +152,9 @@ class Extension extends AbstractPluginIntegration {
 			}
 		);
 
-		return $gateways;
+		$this->gateways = $gateways;
+
+		return $this->gateways;
 	}
 
 	/**
@@ -172,7 +185,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @param PaymentGatewayRegister $payment_gateway_register Payment gateway register.
 	 * @return void
 	 */
-	private function register_payment_gateways( PaymentGatewayRegister $payment_gateway_register ): void {
+	private function register_payment_gateways( PaymentGatewayRegister $payment_gateway_register ): void {echo 'REGISTER';
 		foreach ( $this->get_gateways() as $gateway_id => $gateway_data ) {
 			if ( $payment_gateway_register->hasPaymentGateway( $gateway_id ) ) {
 				continue;
