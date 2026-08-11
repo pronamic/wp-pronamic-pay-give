@@ -150,10 +150,58 @@ abstract class Gateway extends PaymentGateway {
 	 * @return string
 	 */
 	public function getLegacyFormFieldMarkup( int $form_id, array $args ): string {
-		return \sprintf(
-			'<div class="pronamic-pay-give-help-text"><p>%s</p></div>',
-			\esc_html( $this->get_checkout_message() )
-		);
+		$output = '';
+
+		if ( \filter_has_var( INPUT_GET, 'payment-error' ) ) {
+			$output .= \sprintf(
+				'<div class="give_error">%s</div>',
+				\esc_html( Plugin::get_default_error_message() )
+			);
+		}
+
+		$config_id      = $this->get_config_id();
+		$gateway        = Plugin::get_gateway( $config_id );
+		$payment_method = $this->get_payment_method();
+
+		if ( null !== $gateway && null !== $payment_method ) {
+			$method = $gateway->get_payment_method( $payment_method );
+
+			if ( null !== $method ) {
+				try {
+					foreach ( $method->get_fields() as $field ) {
+						$required_indicator = $field->is_required()
+							? '<span class="give-required-indicator">*</span>'
+							: '';
+
+						\ob_start();
+						$field->output();
+						$field_html = (string) \ob_get_clean();
+
+						$output .= \sprintf(
+							'<p class="form-row form-row-wide"><label class="give-label">%s%s</label>%s</p>',
+							\esc_html( $field->get_label() ),
+							$required_indicator,
+							$field_html
+						);
+					}
+				} catch ( \Exception $e ) {
+					$output .= \sprintf(
+						'<div class="give_error">%s<br /><br />%s</div>',
+						\esc_html( Plugin::get_default_error_message() ),
+						\esc_html( \sprintf( '%s: %s', $e->getCode(), $e->getMessage() ) )
+					);
+				}
+			}
+		}
+
+		if ( '' === $output ) {
+			$output = \sprintf(
+				'<div class="pronamic-pay-give-help-text"><p>%s</p></div>',
+				\esc_html( $this->get_checkout_message() )
+			);
+		}
+
+		return $output;
 	}
 
 	/**
