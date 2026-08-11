@@ -63,7 +63,7 @@ class GiveHelper {
 	 *
 	 * @param array  $array Array.
 	 * @param string $key   Key.
-	 * @return string|null
+	 * @return mixed
 	 */
 	private static function get_value_from_array( $array, $key ) {
 		if ( ! array_key_exists( $key, $array ) ) {
@@ -108,6 +108,10 @@ class GiveHelper {
 	 */
 	public static function get_address_from_user_info( $user_info, $donation_id ) {
 		$address_info = self::get_value_from_array( $user_info, 'address' );
+
+		if ( ! \is_array( $address_info ) ) {
+			$address_info = [];
+		}
 
 		return AddressHelper::from_array(
 			[
