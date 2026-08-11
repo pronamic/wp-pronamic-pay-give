@@ -7,6 +7,32 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.0] - 2026-08-11
+
+### Changed
+
+- Raised minimum PHP requirement to 8.1.
+- Updated license from GPL-3.0-or-later to GPL-2.0-or-later.
+- Adopted PHP 8.0+ syntax: `match` expressions and `str_starts_with()`.
+- Added null guard for `get_edit_post_link()` return value.
+- Added ABSPATH guard in main plugin file.
+- Added stricter type hints to gateway and extension methods.
+- Replaced Grunt tooling with `@wordpress/scripts`.
+- Added Rector code transformation setup.
+- Raised PHPStan to level 9 and updated to v2.
+- Switched Composer repository from wpackagist.org to repo.wp-packages.org.
+- Replaced `wpackagist-plugin/give` with `wp-plugin/give ^4.16`.
+- Added `automattic/jetpack-autoloader` as a runtime dependency.
+- Updated `pronamic/wp-coding-standards` from ^1.3 to ^2.3.
+- Updated `szepeviktor/phpstan-wordpress` from ^1.3 to ^2.0.
+- Updated `vimeo/psalm` to ^5.26.
+- Updated `@wordpress/env` from ^5.2.0 to ^11.12.0.
+- Updated copyright years to 2026.
+
+Full set of changes: [`4.2.5...4.3.0`][4.3.0]
+
+[4.3.0]: https://github.com/pronamic/wp-pronamic-pay-give/compare/v4.2.5...v4.3.0
+
 ## [4.2.5] - 2025-11-11
 
 ### Commits
