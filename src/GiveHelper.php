@@ -27,7 +27,7 @@ class GiveHelper {
 	 * @param int $donation_id Donation ID.
 	 * @return string
 	 */
-	public static function get_title( $donation_id ) {
+	public static function get_title( int $donation_id ): string {
 		return \sprintf(
 			/* translators: %s: Give donation ID */
 			__( 'Give donation %s', 'pronamic_ideal' ),
@@ -38,15 +38,18 @@ class GiveHelper {
 	/**
 	 * Get description.
 	 *
+	 * @param Gateway $gateway Gateway.
+	 * @param int     $donation_id Donation ID.
+	 *
 	 * @return string
 	 */
-	public static function get_description( $gateway, $donation_id ) {
+	public static function get_description( Gateway $gateway, int $donation_id ): string {
 		$search = [
 			'{donation_id}',
 		];
 
 		$replace = [
-			$donation_id,
+			(string) $donation_id,
 		];
 
 		$description = $gateway->get_transaction_description();
@@ -61,22 +64,27 @@ class GiveHelper {
 	/**
 	 * Get value from array.
 	 *
-	 * @param array  $array Array.
-	 * @param string $key   Key.
+	 * @param array<string, mixed> $data  Array.
+	 * @param string                $key   Key.
 	 * @return mixed
 	 */
-	private static function get_value_from_array( $array, $key ) {
-		if ( ! array_key_exists( $key, $array ) ) {
+	private static function get_value_from_array( array $data, string $key ): mixed {
+		if ( ! array_key_exists( $key, $data ) ) {
 			return null;
 		}
 
-		return $array[ $key ];
+		return $data[ $key ];
 	}
 
 	/**
 	 * Get customer from user data.
+	 *
+	 * @param array<string, mixed> $user_info   User info.
+	 * @param int                  $donation_id Donation ID.
+	 *
+	 * @return Customer|null
 	 */
-	public static function get_customer_from_user_info( $user_info, $donation_id ) {
+	public static function get_customer_from_user_info( array $user_info, int $donation_id ): ?Customer {
 		return CustomerHelper::from_array(
 			[
 				'name'    => self::get_name_from_user_info( $user_info ),
@@ -90,9 +98,11 @@ class GiveHelper {
 	/**
 	 * Get name from user data.
 	 *
+	 * @param array<string, mixed> $user_info User info.
+	 *
 	 * @return ContactName|null
 	 */
-	public static function get_name_from_user_info( $user_info ) {
+	public static function get_name_from_user_info( array $user_info ): ?ContactName {
 		return ContactNameHelper::from_array(
 			[
 				'first_name' => self::get_value_from_array( $user_info, 'first_name' ),
@@ -104,9 +114,12 @@ class GiveHelper {
 	/**
 	 * Get address from user info.
 	 *
+	 * @param array<string, mixed> $user_info   User info.
+	 * @param int                  $donation_id Donation ID.
+	 *
 	 * @return Address|null
 	 */
-	public static function get_address_from_user_info( $user_info, $donation_id ) {
+	public static function get_address_from_user_info( array $user_info, int $donation_id ): ?Address {
 		$address_info = self::get_value_from_array( $user_info, 'address' );
 
 		if ( ! \is_array( $address_info ) ) {

@@ -1,6 +1,6 @@
 parameters:
 	customRulesetUsed: false
-	level: 5
+	level: 6
 	scanDirectories:
 		- wp-content/plugins/give/includes
 	paths:

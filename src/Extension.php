@@ -30,7 +30,7 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Gateways.
 	 *
-	 * @var array|null
+	 * @var array<string, array<string, mixed>>|null
 	 */
 	private $gateways;
 
@@ -79,11 +79,11 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L37
 	 *
-	 * @param array $gateways Gateways.
+	 * @param array<string, array<string, mixed>> $gateways Gateways.
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>>
 	 */
-	public function give_payment_gateways( $gateways ) {
+	public function give_payment_gateways( array $gateways ): array {
 		if ( null === $this->gateways ) {
 			$this->gateways = [];
 
@@ -136,10 +136,10 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Give enabled payment gateways.
 	 *
-	 * @param array $gateways Gateways.
-	 * @return array
+	 * @param array<string, mixed> $gateways Gateways.
+	 * @return array<string, mixed>
 	 */
-	public function give_enabled_payment_gateways( $gateways ) {
+	public function give_enabled_payment_gateways( array $gateways ): array {
 		foreach ( $gateways as $key => $gateway ) {
 			// Check if gateway is ours.
 			if ( ! str_starts_with( $key, 'pronamic_pay' ) ) {
@@ -186,8 +186,10 @@ class Extension extends AbstractPluginIntegration {
 	 * @link https://github.com/Charitable/Charitable/blob/1.1.4/includes/gateways/class-charitable-gateway-paypal.php#L229-L357
 	 *
 	 * @param Payment $payment Payment.
+	 *
+	 * @return void
 	 */
-	public function status_update( Payment $payment ) {
+	public function status_update( Payment $payment ): void {
 		$donation_id = (int) $payment->get_source_id();
 
 		match ( $payment->get_status() ) {

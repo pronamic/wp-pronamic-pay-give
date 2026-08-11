@@ -55,12 +55,12 @@ class Gateway {
 	/**
 	 * Add gateways section.
 	 *
-	 * @param array $sections Gateways sections.
+	 * @param array<string, string> $sections Gateways sections.
 	 *
-	 * @return  array
+	 * @return array<string, string>
 	 * @since   2.0.3
 	 */
-	public function gateways_sections( $sections ) {
+	public function gateways_sections( array $sections ): array {
 		// Section title.
 		$title = \__( 'Pronamic', 'pronamic_ideal' );
 
@@ -81,12 +81,12 @@ class Gateway {
 	/**
 	 * Register gateway settings.
 	 *
-	 * @param   array $settings Gateway settings.
+	 * @param   array<int, array<string, mixed>> $settings Gateway settings.
 	 *
-	 * @return  array
+	 * @return  array<int, array<string, mixed>>
 	 * @since   1.0.0
 	 */
-	public function gateway_settings( $settings ) {
+	public function gateway_settings( array $settings ): array {
 		$current_section = give_get_current_setting_section();
 
 		// Check if current section is the gateway ID.
@@ -139,8 +139,10 @@ class Gateway {
 	 * Info fields.
 	 *
 	 * @param int $form_id Form ID.
+	 *
+	 * @return void
 	 */
-	public function input_fields( $form_id ) {
+	public function input_fields( int $form_id ): void {
 		$payment_mode = give_get_chosen_gateway( $form_id );
 
 		if ( $this->id !== $payment_mode ) {
@@ -204,7 +206,7 @@ class Gateway {
 	 * @param int $form_id Form ID.
 	 * @return void
 	 */
-	public function before_submit_input_fields( $form_id ) {
+	public function before_submit_input_fields( int $form_id ): void {
 		if ( \class_exists( 'Give\Helpers\Form\Utils' ) && ! FormUtils::isLegacyForm( $form_id ) ) {
 			return;
 		}
@@ -218,7 +220,7 @@ class Gateway {
 	 * @param int $form_id Form ID.
 	 * @return void
 	 */
-	public function payment_fields( $form_id ) {
+	public function payment_fields( int $form_id ): void {
 		if ( ! \class_exists( 'Give\Helpers\Form\Utils' ) ) {
 			return;
 		}
@@ -235,11 +237,23 @@ class Gateway {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $purchase_data Purchase Data.
+	 * @param array{
+	 *     gateway_nonce: string,
+	 *     post_data: array{
+	 *         give-form-id: int|string,
+	 *         give-form-title: string,
+	 *         give-gateway: string
+	 *     },
+	 *     price: mixed,
+	 *     date: mixed,
+	 *     user_email: string,
+	 *     purchase_key: string,
+	 *     user_info: array<string, mixed>
+	 * } $purchase_data Purchase Data.
 	 *
 	 * @return void
 	 */
-	public function process_purchase( $purchase_data ) {
+	public function process_purchase( array $purchase_data ): void {
 		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'give-gateway' ) ) {
 			wp_die( esc_html__( 'Nonce verification has failed', 'pronamic_ideal' ), esc_html__( 'Error', 'pronamic_ideal' ), [ 'response' => 403 ] );
 		}
@@ -372,7 +386,7 @@ class Gateway {
 	 * @since 1.0.3
 	 * @return string
 	 */
-	public function get_transaction_description() {
+	public function get_transaction_description(): string {
 		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ), '' );
 	}
 
