@@ -309,7 +309,7 @@ class Gateway {
 
 		$payment->source    = 'give';
 		$payment->source_id = $donation_id;
-		$payment->order_id  = $donation_id;
+		$payment->order_id  = (string) $donation_id;
 
 		$payment->set_description( GiveHelper::get_description( $this, $donation_id ) );
 
