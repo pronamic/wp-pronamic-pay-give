@@ -73,7 +73,7 @@
 		"rector/rector": "^2.6",
 		"roots/wordpress-no-content": "^6.9",
 		"szepeviktor/phpstan-wordpress": "^2.0",
-		"vimeo/psalm": "^5.25",
+		"vimeo/psalm": "^5.26",
 		"wp-phpunit/wp-phpunit": "^6.1",
 		"wp-plugin/give": "^4.16",
 		"yoast/phpunit-polyfills": "^1.0"
