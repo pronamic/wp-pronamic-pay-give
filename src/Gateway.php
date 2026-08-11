@@ -24,9 +24,8 @@ class Gateway {
 	/**
 	 * Constructs and initialize a gateway.
 	 *
-	 * @param string $id             Gateway ID.
-	 * @param string $name           Gateway name.
-	 * @param string $payment_method Gateway payment method.
+	 * @param string      $id             Gateway ID.
+	 * @param string|null $payment_method Gateway payment method.
 	 */
 	public function __construct(
 		/**
