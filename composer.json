@@ -52,7 +52,8 @@
 		}
 	],
 	"require": {
-		"php": ">=7.4",
+		"php": ">=8.1",
+		"automattic/jetpack-autoloader": "^5.0",
 		"wp-pay/core": "^4.6"
 	},
 	"require-dev": {
@@ -61,7 +62,7 @@
 		"phpmd/phpmd": "^2.7",
 		"phpstan/phpstan": "^1.11",
 		"pronamic/pronamic-cli": "^1.0",
-		"pronamic/wp-coding-standards": "^1.3",
+		"pronamic/wp-coding-standards": "^2.3",
 		"roots/wordpress": "^6.0",
 		"szepeviktor/phpstan-wordpress": "^1.3",
 		"vimeo/psalm": "^5.25",
@@ -71,6 +72,7 @@
 	},
 	"scripts": {
 		"coveralls": "vendor/bin/php-coveralls -v",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"phpcbf": "XDEBUG_MODE=off vendor/bin/phpcbf",
 		"phpcs": "XDEBUG_MODE=off vendor/bin/phpcs -s -v",
 		"phplint": "find src tests -name '*.php' | xargs -n 1 -P 4 php -l",
