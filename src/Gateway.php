@@ -10,403 +10,285 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
-use Give\Helpers\Form\Utils as FormUtils;
+use Give\Donations\Models\Donation;
+use Give\Donations\Models\DonationNote;
+use Give\Framework\PaymentGateways\Commands\RedirectOffsite;
+use Give\Framework\PaymentGateways\Exceptions\PaymentGatewayException;
+use Give\Framework\PaymentGateways\PaymentGateway;
 use Pronamic\WordPress\Money\Currency;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Gateway class
+ *
+ * Abstract base for the Pronamic Pay GiveWP 3.0 payment gateways. Each Pronamic
+ * payment method is registered as a concrete subclass with its own static `id()`.
  */
-class Gateway {
+abstract class Gateway extends PaymentGateway {
 	/**
-	 * Constructs and initialize a gateway.
+	 * Gateway ID.
 	 *
-	 * @param string      $id             Gateway ID.
-	 * @param string|null $payment_method Gateway payment method.
+	 * @return string
 	 */
-	public function __construct(
-		/**
-		 * Unique identifier.
-		 */
-		public $id = 'pronamic_pay',
-		/**
-		 * The payment method
-		 */
-		protected $payment_method = null
-	) {
-		// Add filters and actions.
-		add_filter( 'give_get_settings_gateways', $this->gateway_settings( ... ) );
-		add_filter( 'give_get_sections_gateways', $this->gateways_sections( ... ) );
+	abstract public static function id(): string;
 
-		add_action( 'give_gateway_' . $this->id, $this->process_purchase( ... ) );
+	/**
+	 * Pronamic payment method (`null` for the generic gateway).
+	 *
+	 * @return string|null
+	 */
+	abstract public function get_payment_method(): ?string;
 
-		if ( defined( 'GIVE_VERSION' ) && version_compare( GIVE_VERSION, '1.7', '>=' ) ) {
-			add_action( 'give_donation_form_before_submit', $this->before_submit_input_fields( ... ) );
-		} else {
-			add_action( 'give_purchase_form_before_submit', $this->before_submit_input_fields( ... ) );
-		}
-
-		add_action( 'give_' . $this->id . '_cc_form', $this->payment_fields( ... ) );
+	/**
+	 * Legacy gateway ID.
+	 *
+	 * @return string
+	 */
+	public function getId(): string {
+		return static::id();
 	}
 
 	/**
-	 * Add gateways section.
+	 * Human-readable gateway name for the admin.
 	 *
-	 * @param array<string, string> $sections Gateways sections.
-	 *
-	 * @return array<string, string>
-	 * @since   2.0.3
+	 * @return string
 	 */
-	public function gateways_sections( array $sections ): array {
-		// Section title.
-		$title = \__( 'Pronamic', 'pronamic_ideal' );
-
-		if ( null !== $this->payment_method ) {
-			$title = \sprintf(
-				'%s - %s',
-				$title,
-				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
-			);
-		}
-
-		// Set section.
-		$sections[ $this->id ] = $title;
-
-		return $sections;
-	}
-
-	/**
-	 * Register gateway settings.
-	 *
-	 * @param   array<int, array<string, mixed>> $settings Gateway settings.
-	 *
-	 * @return  array<int, array<string, mixed>>
-	 * @since   1.0.0
-	 */
-	public function gateway_settings( array $settings ): array {
-		$current_section = give_get_current_setting_section();
-
-		// Check if current section is the gateway ID.
-		if ( $this->id !== $current_section ) {
-			return $settings;
-		}
-
-		$description = '';
-
-		if ( 'pronamic_pay' === $this->id ) {
-			$description = __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' );
-		}
-
-		$settings[] = [
-			'desc' => $description,
-			'id'   => sprintf( 'give_title_%s', $this->id ),
-			'type' => 'title',
-		];
-
-		$settings[] = [
-			'name'    => __( 'Configuration', 'pronamic_ideal' ),
-			'desc'    => '',
-			'id'      => sprintf( 'give_%s_configuration', $this->id ),
-			'type'    => 'select',
-			'options' => Plugin::get_config_select_options( $this->payment_method ),
-			'default' => $this->get_config_id(),
-		];
-
-		$settings[] = [
-			'name'    => __( 'Transaction description', 'pronamic_ideal' ),
-			'desc'    => sprintf(
-				/* translators: %s: <code>{tag}</code> */
-				__( 'Available tags: %s', 'pronamic_ideal' ),
-				sprintf( '<code>%s</code>', '{donation_id}' )
-			),
-			'id'      => sprintf( 'give_%s_transaction_description', $this->id ),
-			'type'    => 'text',
-			'default' => __( 'Give donation {donation_id}', 'pronamic_ideal' ),
-		];
-
-		$settings[] = [
-			'id'   => sprintf( 'give_title_gateway_settings_%s', $this->id ),
-			'type' => 'sectionend',
-		];
-
-		return $settings;
-	}
-
-	/**
-	 * Info fields.
-	 *
-	 * @param int $form_id Form ID.
-	 *
-	 * @return void
-	 */
-	public function input_fields( int $form_id ): void {
-		$payment_mode = give_get_chosen_gateway( $form_id );
-
-		if ( $this->id !== $payment_mode ) {
-			return;
-		}
-
-		// Errors.
-		if ( filter_has_var( INPUT_GET, 'payment-error' ) ) {
-			printf(
-				'<div class="give_error">%s</div>',
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				Plugin::get_default_error_message()
-			);
-		}
-
-		// Gateway.
-		$config_id = $this->get_config_id();
-
-		$gateway = Plugin::get_gateway( $config_id );
-
-		if ( null === $gateway ) {
-			return;
-		}
-
-		if ( null === $this->payment_method ) {
-			return;
-		}
-
-		$payment_method = $gateway->get_payment_method( $this->payment_method );
+	public function getName(): string {
+		$payment_method = $this->get_payment_method();
 
 		if ( null === $payment_method ) {
-			return;
+			return \__( 'Pronamic', 'pronamic_ideal' );
 		}
 
-		try {
-			foreach ( $payment_method->get_fields() as $field ) {
-				?>
-				<p class="form-row form-row-wide">
-					<label class="give-label">
-						<?php echo \esc_html( $field->get_label() ); ?>
-
-						<?php if ( $field->is_required() ) : ?>
-							<span class="give-required-indicator">*</span>
-						<?php endif; ?>
-					</label>
-
-					<?php $field->output(); ?>
-				</p>
-				<?php
-			}
-		} catch ( \Exception $e ) {
-			printf(
-				'<div class="give_error">%s<br /><br />%s</div>',
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				Plugin::get_default_error_message(),
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				sprintf( '%s: %s', $e->getCode(), $e->getMessage() )
-			);
-		}
+		return \sprintf(
+			/* translators: %s: payment method name */
+			\__( 'Pronamic - %s', 'pronamic_ideal' ),
+			PaymentMethods::get_name( $payment_method, \__( 'Pronamic', 'pronamic_ideal' ) )
+		);
 	}
 
 	/**
-	 * Legacy input fields.
+	 * Donor-facing payment method label.
+	 *
+	 * @return string
+	 */
+	public function getPaymentMethodLabel(): string {
+		$fallback = \__( 'Pronamic', 'pronamic_ideal' );
+
+		return PaymentMethods::get_name( $this->get_payment_method(), $fallback ) ?? $fallback;
+	}
+
+	/**
+	 * Supported form versions: v2 (legacy) and v3 (visual builder).
+	 *
+	 * @return array<int, int>
+	 */
+	public function supportsFormVersions(): array {
+		return [ 2, 3 ];
+	}
+
+	/**
+	 * Enqueue the gateway script for the visual donation form builder (v3).
 	 *
 	 * @param int $form_id Form ID.
 	 * @return void
+	 * @throws \RuntimeException When the built gateway asset file is missing.
 	 */
-	public function before_submit_input_fields( int $form_id ): void {
-		if ( \class_exists( 'Give\Helpers\Form\Utils' ) && ! FormUtils::isLegacyForm( $form_id ) ) {
-			return;
-		}
+	public function enqueueScript( int $form_id ) {
+		$asset_file = __DIR__ . '/../js/dist/gateway/index.asset.php';
 
-		$this->input_fields( $form_id );
-	}
-
-	/**
-	 * Input fields.
-	 *
-	 * @param int $form_id Form ID.
-	 * @return void
-	 */
-	public function payment_fields( int $form_id ): void {
-		if ( ! \class_exists( 'Give\Helpers\Form\Utils' ) ) {
-			return;
-		}
-
-		if ( FormUtils::isLegacyForm( $form_id ) ) {
-			return;
-		}
-
-		$this->input_fields( $form_id );
-	}
-
-	/**
-	 * Process purchase.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array{
-	 *     gateway_nonce: string,
-	 *     post_data: array{
-	 *         give-form-id: int|string,
-	 *         give-form-title: string,
-	 *         give-gateway: string
-	 *     },
-	 *     price: mixed,
-	 *     date: mixed,
-	 *     user_email: string,
-	 *     purchase_key: string,
-	 *     user_info: array<string, mixed>
-	 * } $purchase_data Purchase Data.
-	 *
-	 * @return void
-	 */
-	public function process_purchase( array $purchase_data ): void {
-		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'give-gateway' ) ) {
-			wp_die( esc_html__( 'Nonce verification has failed', 'pronamic_ideal' ), esc_html__( 'Error', 'pronamic_ideal' ), [ 'response' => 403 ] );
-		}
-
-		$form_id = intval( $purchase_data['post_data']['give-form-id'] );
-
-		// Collect payment data.
-		$payment_data = [
-			'price'           => $purchase_data['price'],
-			'give_form_title' => $purchase_data['post_data']['give-form-title'],
-			'give_form_id'    => $form_id,
-			'date'            => $purchase_data['date'],
-			'user_email'      => $purchase_data['user_email'],
-			'purchase_key'    => $purchase_data['purchase_key'],
-			'currency'        => give_get_currency(),
-			'user_info'       => $purchase_data['user_info'],
-			'status'          => 'pending',
-			'gateway'         => $this->id,
-		];
-
-		// Record the pending payment.
-		$donation_id = give_insert_payment( $payment_data );
-
-		if ( ! \is_int( $donation_id ) ) {
-			/*
-			 * Record the error.
-			 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
-			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
-			 */
-			give_record_gateway_error(
-				__( 'Payment Error', 'pronamic_ideal' ),
-				sprintf(
-					/* translators: %s: payment data as JSON */
-					__( 'Payment creation failed before sending buyer to payment provider. Payment data: %s', 'pronamic_ideal' ),
-					(string) wp_json_encode( $payment_data )
+		if ( ! \is_readable( $asset_file ) ) {
+			throw new \RuntimeException(
+				\sprintf(
+					/* translators: %s: asset file path */
+					\__( 'Missing GiveWP gateway asset file: %s. Run `npm run build`.', 'pronamic_ideal' ),
+					$asset_file
 				)
 			);
-
-			/*
-			 * Problems? Send back.
-			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
-			 */
-			give_send_back_to_checkout(
-				[
-					'payment-error' => true,
-					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
-				]
-			);
-
-			return;
 		}
 
+		$asset = require $asset_file;
+
+		\wp_enqueue_script(
+			'pronamic-pay-give-gateway',
+			(string) \get_block_asset_url( __DIR__ . '/../js/dist/gateway/index.js' ),
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		\wp_add_inline_script(
+			'pronamic-pay-give-gateway',
+			\sprintf(
+				'window.pronamicPayGive = window.pronamicPayGive || { ids: [] }; window.pronamicPayGive.ids.push( %s );',
+				(string) \wp_json_encode( static::id() )
+			),
+			'before'
+		);
+	}
+
+	/**
+	 * Settings sent to the JavaScript gateway counterpart.
+	 *
+	 * @param int $form_id Form ID.
+	 * @return array<string, mixed>
+	 */
+	public function formSettings( int $form_id ): array {
+		return [
+			'message' => $this->get_checkout_message(),
+		];
+	}
+
+	/**
+	 * Field markup for legacy option-based donation forms (v2).
+	 *
+	 * @param int                  $form_id Form ID.
+	 * @param array<string, mixed> $args    Arguments.
+	 * @return string
+	 */
+	public function getLegacyFormFieldMarkup( int $form_id, array $args ): string {
+		$help_text = \sprintf(
+			'<div class="pronamic-pay-give-help-text"><p>%s</p></div>',
+			\esc_html( $this->get_checkout_message() )
+		);
+
+		$config_id      = $this->get_config_id();
+		$gateway        = Plugin::get_gateway( $config_id );
+		$payment_method = $this->get_payment_method();
+
+		if ( null === $gateway || null === $payment_method ) {
+			return $help_text;
+		}
+
+		$method = $gateway->get_payment_method( $payment_method );
+
+		if ( null === $method ) {
+			return $help_text;
+		}
+
+		$output = '';
+
+		try {
+			foreach ( $method->get_fields() as $field ) {
+				$required_indicator = $field->is_required()
+					? '<span class="give-required-indicator">*</span>'
+					: '';
+
+				$field_html = $field->render();
+
+				$output .= \sprintf(
+					'<p class="form-row form-row-wide"><label class="give-label">%s%s</label>%s</p>',
+					\esc_html( $field->get_label() ),
+					$required_indicator,
+					$field_html
+				);
+			}
+		} catch ( \Exception $e ) {
+			return $output . \sprintf(
+				'<div class="give_error">%s<br /><br />%s</div>',
+				\esc_html( Plugin::get_default_error_message() ),
+				\esc_html( \sprintf( '%s: %s', $e->getCode(), $e->getMessage() ) )
+			);
+		}
+
+		if ( '' === $output ) {
+			return $help_text;
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Create a payment with the gateway.
+	 *
+	 * @param Donation             $donation     Donation.
+	 * @param array<string, mixed> $gateway_data Gateway data.
+	 * @return RedirectOffsite
+	 * @throws PaymentGatewayException When the payment could not be started.
+	 */
+	public function createPayment( Donation $donation, $gateway_data ) {
 		$config_id = $this->get_config_id();
 
 		$gateway = Plugin::get_gateway( $config_id );
 
 		if ( null === $gateway ) {
-			return;
+			throw new PaymentGatewayException( \esc_html( Plugin::get_default_error_message() ) );
 		}
 
-		$user_info = \give_get_payment_meta_user_info( $donation_id );
-
-		/**
-		 * Build payment.
-		 */
 		$payment = new Payment();
 
 		$payment->source    = 'give';
-		$payment->source_id = $donation_id;
-		$payment->order_id  = (string) $donation_id;
+		$payment->source_id = $donation->id;
+		$payment->order_id  = (string) $donation->id;
 
-		$payment->set_description( GiveHelper::get_description( $this, $donation_id ) );
+		$payment->set_description( GiveHelper::get_description( $this, $donation ) );
 
-		$payment->title = GiveHelper::get_title( $donation_id );
+		$payment->title = GiveHelper::get_title( $donation->id );
 
-		// Customer.
-		$payment->set_customer( GiveHelper::get_customer_from_user_info( $user_info, $donation_id ) );
+		$payment->set_customer( GiveHelper::get_customer_from_donation( $donation ) );
+		$payment->set_billing_address( GiveHelper::get_address_from_donation( $donation ) );
 
-		// Address.
-		$payment->set_billing_address( GiveHelper::get_address_from_user_info( $user_info, $donation_id ) );
+		$currency = Currency::get_instance( \give_get_payment_currency_code( $donation->id ) );
 
-		// Currency.
-		$currency = Currency::get_instance( \give_get_payment_currency_code( $donation_id ) );
+		$payment->set_total_amount( new Money( $donation->amount->formatToDecimal(), $currency ) );
 
-		// Amount.
-		$payment->set_total_amount( new Money( \give_donation_amount( $donation_id ), $currency ) );
+		$payment->set_payment_method( $this->get_payment_method() );
 
-		// Payment method.
-		$payment->set_payment_method( $this->payment_method );
-
-		// Configuration.
 		$payment->config_id = $config_id;
 
-		// Start.
 		try {
 			$payment = Plugin::start_payment( $payment );
-
-			// Redirect.
-			\wp_safe_redirect( $payment->get_pay_redirect_url(), 303 );
-
-			exit;
 		} catch ( \Exception $e ) {
-			/*
-			 * Record the error.
-			 * /wp-admin/edit.php?post_type=give_forms&page=give-reports&tab=logs&view=gateway_errors
-			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/gateways/functions.php#L267-L285
-			 */
-			give_record_gateway_error(
-				__( 'Payment Error', 'pronamic_ideal' ),
-				$e->getMessage(),
-				$donation_id
-			);
-
-			/*
-			 * Problems? Send back.
-			 * @link https://github.com/WordImpress/Give/blob/1.3.6/includes/forms/functions.php#L150-L184
-			 */
-			give_send_back_to_checkout(
+			DonationNote::create(
 				[
-					'payment-error' => true,
-					'payment-mode'  => $purchase_data['post_data']['give-gateway'],
+					'donationId' => $donation->id,
+					'content'    => \sprintf(
+						/* translators: %s: error message */
+						\__( 'Pronamic Pay payment could not be created: %s', 'pronamic_ideal' ),
+						$e->getMessage()
+					),
 				]
 			);
+
+			throw new PaymentGatewayException( \esc_html( $e->getMessage() ) );
 		}
+
+		return new RedirectOffsite( $payment->get_pay_redirect_url() );
 	}
 
 	/**
-	 * Get transaction description setting.
-	 *
-	 * @since 1.0.3
-	 * @return string
-	 */
-	public function get_transaction_description(): string {
-		return give_get_option( sprintf( 'give_%s_transaction_description', $this->id ), '' );
-	}
-
-	/**
-	 * Get config ID.
+	 * Get the configured Pronamic gateway configuration ID.
 	 *
 	 * @return mixed
 	 */
-	protected function get_config_id() {
-		$config_id = give_get_option( sprintf( 'give_%s_configuration', $this->id ) );
+	public function get_config_id() {
+		$config_id = \give_get_option( \sprintf( 'give_%s_configuration', static::id() ) );
 
 		if ( empty( $config_id ) ) {
-			// Use default gateway if no configuration has been set.
-			$config_id = get_option( 'pronamic_pay_config_id' );
+			$config_id = \get_option( 'pronamic_pay_config_id' );
 		}
 
 		return $config_id;
+	}
+
+	/**
+	 * Get the transaction description setting.
+	 *
+	 * @return string
+	 */
+	public function get_transaction_description(): string {
+		return (string) \give_get_option( \sprintf( 'give_%s_transaction_description', static::id() ), '' );
+	}
+
+	/**
+	 * Message shown to the donor before the offsite redirect.
+	 *
+	 * @return string
+	 */
+	protected function get_checkout_message(): string {
+		return \__( 'After submitting your donation you will be redirected to securely complete the payment.', 'pronamic_ideal' );
 	}
 }

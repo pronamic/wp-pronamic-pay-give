@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\Give;
 
+use Give\Donations\Models\Donation;
 use Pronamic\WordPress\Pay\Address;
 use Pronamic\WordPress\Pay\AddressHelper;
 use Pronamic\WordPress\Pay\ContactName;
@@ -30,7 +31,7 @@ class GiveHelper {
 	public static function get_title( int $donation_id ): string {
 		return \sprintf(
 			/* translators: %s: Give donation ID */
-			__( 'Give donation %s', 'pronamic_ideal' ),
+			\__( 'Give donation %s', 'pronamic_ideal' ),
 			$donation_id
 		);
 	}
@@ -38,105 +39,72 @@ class GiveHelper {
 	/**
 	 * Get description.
 	 *
-	 * @param Gateway $gateway Gateway.
-	 * @param int     $donation_id Donation ID.
-	 *
+	 * @param Gateway  $gateway  Gateway.
+	 * @param Donation $donation Donation.
 	 * @return string
 	 */
-	public static function get_description( Gateway $gateway, int $donation_id ): string {
-		$search = [
-			'{donation_id}',
-		];
-
-		$replace = [
-			(string) $donation_id,
-		];
-
+	public static function get_description( Gateway $gateway, Donation $donation ): string {
 		$description = $gateway->get_transaction_description();
 
 		if ( '' === $description ) {
-			$description = self::get_title( $donation_id );
+			$description = self::get_title( $donation->id );
 		}
 
-		return str_replace( $search, $replace, $description );
+		return \str_replace( '{donation_id}', (string) $donation->id, $description );
 	}
 
 	/**
-	 * Get value from array.
+	 * Get customer from donation.
 	 *
-	 * @param array<string, mixed> $data  Array.
-	 * @param string                $key   Key.
-	 * @return mixed
-	 */
-	private static function get_value_from_array( array $data, string $key ): mixed {
-		if ( ! array_key_exists( $key, $data ) ) {
-			return null;
-		}
-
-		return $data[ $key ];
-	}
-
-	/**
-	 * Get customer from user data.
-	 *
-	 * @param array<string, mixed> $user_info   User info.
-	 * @param int                  $donation_id Donation ID.
-	 *
+	 * @param Donation $donation Donation.
 	 * @return Customer|null
 	 */
-	public static function get_customer_from_user_info( array $user_info, int $donation_id ): ?Customer {
+	public static function get_customer_from_donation( Donation $donation ): ?Customer {
 		return CustomerHelper::from_array(
 			[
-				'name'    => self::get_name_from_user_info( $user_info ),
-				'email'   => \give_get_payment_user_email( $donation_id ),
-				'phone'   => null,
+				'name'    => self::get_name_from_donation( $donation ),
+				'email'   => $donation->email,
+				'phone'   => '' === $donation->phone ? null : $donation->phone,
 				'user_id' => null,
 			]
 		);
 	}
 
 	/**
-	 * Get name from user data.
+	 * Get contact name from donation.
 	 *
-	 * @param array<string, mixed> $user_info User info.
-	 *
+	 * @param Donation $donation Donation.
 	 * @return ContactName|null
 	 */
-	public static function get_name_from_user_info( array $user_info ): ?ContactName {
+	public static function get_name_from_donation( Donation $donation ): ?ContactName {
 		return ContactNameHelper::from_array(
 			[
-				'first_name' => self::get_value_from_array( $user_info, 'first_name' ),
-				'last_name'  => self::get_value_from_array( $user_info, 'last_name' ),
+				'first_name' => $donation->firstName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				'last_name'  => $donation->lastName, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			]
 		);
 	}
 
 	/**
-	 * Get address from user info.
+	 * Get address from donation.
 	 *
-	 * @param array<string, mixed> $user_info   User info.
-	 * @param int                  $donation_id Donation ID.
-	 *
+	 * @param Donation $donation Donation.
 	 * @return Address|null
 	 */
-	public static function get_address_from_user_info( array $user_info, int $donation_id ): ?Address {
-		$address_info = self::get_value_from_array( $user_info, 'address' );
-
-		if ( ! \is_array( $address_info ) ) {
-			$address_info = [];
-		}
+	public static function get_address_from_donation( Donation $donation ): ?Address {
+		$billing_address = $donation->billingAddress; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 		return AddressHelper::from_array(
 			[
-				'name'         => self::get_name_from_user_info( $user_info ),
-				'line_1'       => self::get_value_from_array( $address_info, 'line1' ),
-				'line_2'       => self::get_value_from_array( $address_info, 'line2' ),
-				'postal_code'  => self::get_value_from_array( $address_info, 'zip' ),
-				'city'         => self::get_value_from_array( $address_info, 'city' ),
-				'region'       => null,
-				'country_code' => null,
-				'email'        => \give_get_payment_user_email( $donation_id ),
-				'phone'        => null,
+				'name'         => self::get_name_from_donation( $donation ),
+				'line_1'       => $billing_address->address1,
+				'line_2'       => $billing_address->address2,
+				'postal_code'  => $billing_address->zip,
+				'city'         => $billing_address->city,
+				'region'       => $billing_address->state,
+				'country_code' => $billing_address->country,
+				'email'        => $donation->email,
+				'phone'        => '' === $donation->phone ? null : $donation->phone,
 			]
 		);
 	}

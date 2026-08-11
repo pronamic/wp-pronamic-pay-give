@@ -19,11 +19,18 @@ class GiveDependency extends Dependency {
 	/**
 	 * Is met.
 	 *
+	 * Requires GiveWP with the 3.0 payment gateway API (GiveWP 3.0+, tested up
+	 * to 4.16).
+	 *
 	 * @link https://github.com/impress-org/givewp/blob/2.6.0/give.php#L52
 	 * @return bool True if dependency is met, false otherwise.
 	 */
 	public function is_met() {
 		if ( ! \class_exists( '\Give' ) ) {
+			return false;
+		}
+
+		if ( ! \class_exists( '\Give\Framework\PaymentGateways\PaymentGateway' ) ) {
 			return false;
 		}
 

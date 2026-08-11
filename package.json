@@ -1,6 +1,6 @@
 {
 	"name": "give",
-	"version": "4.3.0",
+	"version": "4.4.0-dev",
 	"description": "Give driver for the WordPress payment processing library.",
 	"author": {
 		"name": "Pronamic",
@@ -39,6 +39,8 @@
 	},
 	"prettier": "@wordpress/prettier-config",
 	"scripts": {
+		"build": "wp-scripts build --webpack-src-dir=js/src/gateway --output-path=js/dist/gateway",
+		"watch": "wp-scripts start --webpack-src-dir=js/src/gateway --output-path=js/dist/gateway",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"start": "wp-env start && npm run setup && npm run login",
 		"setup": "npm-run-all setup-*",

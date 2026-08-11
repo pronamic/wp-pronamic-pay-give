@@ -1,0 +1,1 @@
+(()=>{"use strict";const e=window.wp.element;(()=>{const i=window.pronamicPayGive||{ids:[]};[...new Set(i.ids)].forEach(i=>{let t={};window.givewp.gateways.register({id:i,initialize(){t=this.settings||{}},Fields:()=>(0,e.createElement)("div",{className:"pronamic-pay-give-help-text"},(0,e.createElement)("p",{style:{marginBottom:0}},t.message||""))})})})()})();

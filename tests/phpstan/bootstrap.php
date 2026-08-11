@@ -8,4 +8,6 @@
  * @package   Pronamic\WordPress\Pay
  */
 
-define( 'SCRIPT_DEBUG', true );
+if ( ! defined( 'SCRIPT_DEBUG' ) ) {
+	define( 'SCRIPT_DEBUG', true );
+}
