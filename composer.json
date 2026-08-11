@@ -51,6 +51,11 @@
 	},
 	"repositories": [
 		{
+			"name": "wp-packages",
+			"type": "composer",
+			"url": "https://repo.wp-packages.org"
+		},
+		{
 			"type": "composer",
 			"url": "https://wpackagist.org",
 			"only": [
@@ -74,6 +79,7 @@
 		"szepeviktor/phpstan-wordpress": "^1.3",
 		"vimeo/psalm": "^5.25",
 		"wp-phpunit/wp-phpunit": "^6.1",
+		"wp-plugin/give": "^4.16",
 		"wpackagist-plugin/give": "^4.15",
 		"yoast/phpunit-polyfills": "^1.0"
 	},
