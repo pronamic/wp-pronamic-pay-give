@@ -39,11 +39,12 @@
 	"config": {
 		"sort-packages": true,
 		"allow-plugins": {
+			"automattic/jetpack-autoloader": true,
+			"bamarni/composer-bin-plugin": true,
 			"composer/installers": true,
 			"dealerdirect/phpcodesniffer-composer-installer": true,
-			"roots/wordpress-core-installer": true,
-			"bamarni/composer-bin-plugin": true,
-			"automattic/jetpack-autoloader": true
+			"phpstan/extension-installer": true,
+			"roots/wordpress-core-installer": true
 		},
 		"platform": {
 			"php": "8.1"
@@ -65,6 +66,7 @@
 		"bamarni/composer-bin-plugin": "^1.4",
 		"php-coveralls/php-coveralls": "^2.5",
 		"phpmd/phpmd": "^2.7",
+		"phpstan/extension-installer": "^1.4",
 		"phpstan/phpstan": "^2.2",
 		"pronamic/pronamic-cli": "^1.0",
 		"pronamic/wp-coding-standards": "^2.3",
