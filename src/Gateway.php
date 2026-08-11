@@ -29,43 +29,35 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  */
 class Gateway {
 	/**
-	 * The payment method
-	 *
-	 * @var string
-	 */
-	protected $payment_method;
-
-	/**
-	 * Unique identifier.
-	 *
-	 * @var string
-	 */
-	public $id;
-
-	/**
 	 * Constructs and initialize a gateway.
 	 *
 	 * @param string $id             Gateway ID.
 	 * @param string $name           Gateway name.
 	 * @param string $payment_method Gateway payment method.
 	 */
-	public function __construct( $id = 'pronamic_pay', $payment_method = null ) {
-		$this->id             = $id;
-		$this->payment_method = $payment_method;
-
+	public function __construct(
+		/**
+		 * Unique identifier.
+		 */
+		public $id = 'pronamic_pay',
+		/**
+		 * The payment method
+		 */
+		protected $payment_method = null
+	) {
 		// Add filters and actions.
-		add_filter( 'give_get_settings_gateways', [ $this, 'gateway_settings' ] );
-		add_filter( 'give_get_sections_gateways', [ $this, 'gateways_sections' ] );
+		add_filter( 'give_get_settings_gateways', $this->gateway_settings( ... ) );
+		add_filter( 'give_get_sections_gateways', $this->gateways_sections( ... ) );
 
-		add_action( 'give_gateway_' . $this->id, [ $this, 'process_purchase' ] );
+		add_action( 'give_gateway_' . $this->id, $this->process_purchase( ... ) );
 
 		if ( defined( 'GIVE_VERSION' ) && version_compare( GIVE_VERSION, '1.7', '>=' ) ) {
-			add_action( 'give_donation_form_before_submit', [ $this, 'before_submit_input_fields' ] );
+			add_action( 'give_donation_form_before_submit', $this->before_submit_input_fields( ... ) );
 		} else {
-			add_action( 'give_purchase_form_before_submit', [ $this, 'before_submit_input_fields' ] );
+			add_action( 'give_purchase_form_before_submit', $this->before_submit_input_fields( ... ) );
 		}
 
-		add_action( 'give_' . $this->id . '_cc_form', [ $this, 'payment_fields' ] );
+		add_action( 'give_' . $this->id . '_cc_form', $this->payment_fields( ... ) );
 	}
 
 	/**
