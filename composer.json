@@ -54,13 +54,6 @@
 			"name": "wp-packages",
 			"type": "composer",
 			"url": "https://repo.wp-packages.org"
-		},
-		{
-			"type": "composer",
-			"url": "https://wpackagist.org",
-			"only": [
-				"wpackagist-plugin/*"
-			]
 		}
 	],
 	"require": {
@@ -72,16 +65,15 @@
 		"bamarni/composer-bin-plugin": "^1.4",
 		"php-coveralls/php-coveralls": "^2.5",
 		"phpmd/phpmd": "^2.7",
-		"phpstan/phpstan": "^2.0",
+		"phpstan/phpstan": "^2.2",
 		"pronamic/pronamic-cli": "^1.0",
 		"pronamic/wp-coding-standards": "^2.3",
-		"rector/rector": "^2.0",
-		"roots/wordpress": "^6.0",
+		"rector/rector": "^2.6",
+		"roots/wordpress-no-content": "^6.9",
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"vimeo/psalm": "^5.25",
 		"wp-phpunit/wp-phpunit": "^6.1",
 		"wp-plugin/give": "^4.16",
-		"wpackagist-plugin/give": "^2.9",
 		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"scripts": {
