@@ -5,6 +5,8 @@
 
 	<exclude-pattern>tests/bootstrap.php</exclude-pattern>
 	<exclude-pattern>tests/wp-config.php</exclude-pattern>
+	<exclude-pattern>bin/*</exclude-pattern>
+	<exclude-pattern>js/dist/*</exclude-pattern>
 
 	<rule ref="PronamicWP">
 		<exclude name="Squiz.Commenting" />

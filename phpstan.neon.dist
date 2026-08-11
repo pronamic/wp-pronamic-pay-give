@@ -1,7 +1,10 @@
 parameters:
 	customRulesetUsed: false
 	level: 8
+	bootstrapFiles:
+		- tests/phpstan/bootstrap.php
 	scanDirectories:
 		- wp-content/plugins/give/includes
+		- wp-content/plugins/give/src
 	paths:
 		- src/
