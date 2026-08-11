@@ -167,6 +167,10 @@ class Gateway {
 			return;
 		}
 
+		if ( null === $this->payment_method ) {
+			return;
+		}
+
 		$payment_method = $gateway->get_payment_method( $this->payment_method );
 
 		if ( null === $payment_method ) {

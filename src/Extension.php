@@ -245,6 +245,12 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string
 	 */
 	public function source_url( $url, Payment $payment ) {
-		return get_edit_post_link( (int) $payment->source_id );
+		$source_url = \get_edit_post_link( (int) $payment->source_id );
+
+		if ( null === $source_url ) {
+			return $url;
+		}
+
+		return $source_url;
 	}
 }
