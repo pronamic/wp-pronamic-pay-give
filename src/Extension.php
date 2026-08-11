@@ -4,7 +4,7 @@
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2026 Pronamic
- * @license   GPL-3.0-or-later
+ * @license   GPL-2.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
 
@@ -17,14 +17,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
- * Title: Give extension
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
- *
- * @author  Reüel van der Steege
- * @version 2.1.1
- * @since   1.0.0
+ * Extension class
  */
 class Extension extends AbstractPluginIntegration {
 	/**

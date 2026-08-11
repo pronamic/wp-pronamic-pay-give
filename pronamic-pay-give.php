@@ -14,7 +14,7 @@
  * Text Domain: pronamic-pay-give
  * Domain Path: /languages/
  *
- * License: GPL-3.0-or-later
+ * License: GPL-2.0-or-later
  *
  * Requires Plugins: pronamic-ideal, give
  * Depends: wp-pay/core
@@ -23,7 +23,7 @@
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2026 Pronamic
- * @license   GPL-3.0-or-later
+ * @license   GPL-2.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
 

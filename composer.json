@@ -10,7 +10,7 @@
 		"pronamic"
 	],
 	"homepage": "http://www.wp-pay.org/extensions/give/",
-	"license": "GPL-3.0-or-later",
+	"license": "GPL-2.0-or-later",
 	"type": "wordpress-plugin",
 	"authors": [
 		{

@@ -4,7 +4,7 @@
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2026 Pronamic
- * @license   GPL-3.0-or-later
+ * @license   GPL-2.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
 
@@ -18,14 +18,7 @@ use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
- * Title: Give gateway
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
- *
- * @author  Reüel van der Steege
- * @version 2.0.4
- * @since   1.0.0
+ * Gateway class
  */
 class Gateway {
 	/**
