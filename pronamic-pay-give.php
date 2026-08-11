@@ -27,6 +27,22 @@
  * @package   Pronamic\WordPress\Pay\Extensions\Give
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Autoload.
+ */
+$autoload_path = __DIR__ . '/vendor/autoload_packages.php';
+
+if ( file_exists( $autoload_path ) ) {
+	require_once $autoload_path;
+}
+
+/**
+ * Bootstrap.
+ */
 add_filter(
 	'pronamic_pay_plugin_integrations',
 	function ( $integrations ) {
