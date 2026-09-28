@@ -1,6 +1,6 @@
 {
 	"name": "give",
-	"version": "4.4.0-dev",
+	"version": "5.0.0",
 	"description": "Give driver for the WordPress payment processing library.",
 	"author": {
 		"name": "Pronamic",

@@ -6,6 +6,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+## [5.0.0] - 2026-09-28
+
 ### Added
 
 - Support for the GiveWP 3.0+ Visual Donation Form Builder and its new payment gateway API ([#7](https://github.com/pronamic/wp-pronamic-pay-give/issues/7)).
@@ -17,6 +19,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 - Rewrote the integration on top of `Give\Framework\PaymentGateways\PaymentGateway` (`createPayment()` returns a `RedirectOffsite` command).
 - Donation status updates now use the GiveWP `Donation` model and `DonationStatus` value object.
 - Gateway settings reuse the legacy option keys so existing configuration and enabled gateways migrate seamlessly.
+- Raised minimum PHP requirement to 8.2.
 
 ### Removed
 
@@ -25,6 +28,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ### Requirements
 
 - Requires GiveWP 3.0 or later (tested up to 4.16). Support is provided for the three most recent major releases (4.14, 4.15, 4.16).
+- Requires PHP 8.2 or later.
+
+### Composer
+
+- Changed `wp-pay/core` from `^4.6` to `^4.35`.
+- `wp-pay/core` updated to `v4.35.0`. Subscription renewal pre-notifications are now sent 14 days (instead of 1 week) in advance, the next payment date is hidden for cancelled subscriptions, and it fixes a currency mismatch exception for payments in currencies other than EUR, plus errors when loading payments or subscriptions whose post no longer exists. ([Release notes](https://github.com/pronamic/wp-pay-core/releases/tag/v4.35.0))
+
+Full set of changes: [`4.3.0...5.0.0`][5.0.0]
+
+[5.0.0]: https://github.com/pronamic/wp-pronamic-pay-give/compare/v4.3.0...v5.0.0
 
 ## [4.3.0] - 2026-08-11
 
@@ -194,7 +207,7 @@ Full set of changes: [`4.1.1...4.2.0`][4.2.0]
 ## 1.0.0 - 2016-03-23
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/give/compare/4.1.1...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-give/compare/v5.0.0...HEAD
 [4.1.1]: https://github.com/pronamic/wp-pronamic-pay-give/compare/4.1.0...4.1.1
 [4.1.0]: https://github.com/pronamic/wp-pronamic-pay-give/compare/4.0.0...4.1.0
 [4.0.0]: https://github.com/wp-pay-extensions/give/compare/3.0.0...4.0.0
