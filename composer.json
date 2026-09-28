@@ -60,7 +60,7 @@
 	"require": {
 		"php": ">=8.2",
 		"automattic/jetpack-autoloader": "^5.0",
-		"wp-pay/core": "^4.6"
+		"wp-pay/core": "^4.35"
 	},
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.4",
