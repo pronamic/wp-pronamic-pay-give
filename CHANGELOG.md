@@ -6,6 +6,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+### Composer
+
+- Allow `automattic/jetpack-autoloader` `^5.0 || ^6.0`, retaining version 5 support. Version 6 requires PHP 7.4 or later (covered by this package's PHP 8.2 minimum) and Composer Plugin API `^2.2`.
+
 ## [5.0.0] - 2026-09-28
 
 ### Added
