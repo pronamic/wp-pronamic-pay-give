@@ -6,9 +6,15 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+## [5.0.1] - 2026-11-02
+
 ### Composer
 
-- Allow `automattic/jetpack-autoloader` `^5.0 || ^6.0`, retaining version 5 support. Version 6 requires PHP 7.4 or later (covered by this package's PHP 8.2 minimum) and Composer Plugin API `^2.2`.
+- Changed `automattic/jetpack-autoloader` from `^5.0` to `^5.0 || ^6.0` to allow Jetpack Autoloader 6.x. Jetpack Autoloader 6.0.0 only raises its minimum PHP version to 7.4. Release notes: https://github.com/Automattic/jetpack-autoloader/blob/v6.0.0/CHANGELOG.md
+
+Full set of changes: [`5.0.0...5.0.1`][5.0.1]
+
+[5.0.1]: https://github.com/pronamic/wp-pronamic-pay-give/compare/v5.0.0...v5.0.1
 
 ## [5.0.0] - 2026-09-28
 
@@ -211,7 +217,7 @@ Full set of changes: [`4.1.1...4.2.0`][4.2.0]
 ## 1.0.0 - 2016-03-23
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-give/compare/v5.0.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-give/compare/v5.0.1...HEAD
 [4.1.1]: https://github.com/pronamic/wp-pronamic-pay-give/compare/4.1.0...4.1.1
 [4.1.0]: https://github.com/pronamic/wp-pronamic-pay-give/compare/4.0.0...4.1.0
 [4.0.0]: https://github.com/wp-pay-extensions/give/compare/3.0.0...4.0.0
